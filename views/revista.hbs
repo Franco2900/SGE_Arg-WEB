@@ -1,0 +1,28 @@
+<h1><center>{{tituloSitioWeb}}</center></h1>
+
+<p>Estas son las revistas argentinas que se encuentran en el sitio web {{tituloSitioWeb}}</p>
+<p>Cantidad de revistas en {{tituloSitioWeb}}: {{cantidadRevistas}}</p>
+
+<table id="tablaRevistas" border="1">
+    <thead>
+        <tr>
+            <th>Titulo</th>
+            <th>ISSN impreso</th>
+            <th>ISSN electronico</th>
+            <th>Instituto/Editorial</th>
+        </tr>
+    </thead>
+    {{#each paginacionRevistas}}
+        <tr>
+            <td>{{tituloRevista}}</td>
+            <td>{{issnImpreso}}</td>
+            <td>{{issnEnLinea}}</td>
+            <td>{{instituto}}</td>
+        </tr>
+    {{/each}}
+</table>
+
+<button id="botonAnterior">Anterior</button>
+<button id="botonSiguiente">Siguiente</button>
+
+<a href="/">Volver</a>

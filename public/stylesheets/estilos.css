@@ -1,0 +1,26 @@
+.fondoClaro{
+    background-color: rgb(255, 250, 210);
+    color: black;
+}
+
+.fondoClaro table{
+    background-color: azure;
+}
+
+.fondoClaro table thead{
+    background-color: rgb(255, 250, 190);
+}
+
+
+.fondoOscuro{
+    background-color: rgb(20, 20, 20);
+    color: white;
+}
+
+.fondoOscuro table{
+    background-color: rgb(100, 100, 100);
+}
+
+.fondoOscuro table thead{
+    background-color: rgb(70, 70, 70);
+}

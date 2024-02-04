@@ -1,0 +1,3 @@
+Cuando extraemos los datos tenemos que usar los mismos nombres de variables en todos los archivos
+
+Fijarse como mejorar la velocidad de extracción de datos
