@@ -112,31 +112,64 @@ function armarHTML(archivoJSON, tituloSitioWeb){
                 });
 
             </script>
-        `
+    `
 
-    if(tituloSitioWeb == 'Listado de revistas')
-    {
-        pagina +=  `<p>Estas son todas las revistas argentinas que se pudieron encontrar</p>
-                    <p>Cantidad de revistas argentinas: ${cantidadRevistas}</p>`
-    }
-    else
-    {
-        pagina +=  `<p>Estas son las revistas argentinas que se encuentran en el sitio web ${tituloSitioWeb}</p>
-                    <p>Cantidad de revistas en ${tituloSitioWeb}: ${cantidadRevistas}</p>`
-    }
+    if(tituloSitioWeb == 'Listado de revistas') pagina +=  `<p>Estas son todas las revistas argentinas que se pudieron encontrar en todos los sitios web</p>`
+    else                                        pagina +=  `<p>Estas son las revistas argentinas que se encuentran en el sitio web ${tituloSitioWeb}</p>`
             
+    pagina += 
+    `
+        <p>Página <span id="paginaActual">1</span> de ${cantidaPaginas}</p>
+
+        <button id="botonPrimeraPagina"> <<< </button>
+        <button id="botonAnterior">       <  </button>
+        <!-- <input id="buscarPaginaEspecifica" type="number" min="1" max="${cantidaPaginas}" placeholder="Ingrese página a buscar"> -->
+        <input id="buscarPaginaEspecifica" type="number" placeholder="Ingrese página a buscar">
+        <button id="botonSiguiente">      >  </button>
+        <button id="botonUltimaPagina">  >>> </button>     
+        
+        <br><br/>
+    `
+
     pagina += armarTablaDeRevistas(primeras20Revistas, 1);
 
     pagina +=
-            `<p>Página <span id="paginaActual">1</span> de ${cantidaPaginas}</p>
+    `
+            <script>
 
-            <button id="botonAnterior">Anterior</button>
-            <button id="botonSiguiente">Siguiente</button>
+                document.getElementById("buscarPaginaEspecifica").addEventListener("change", function(){
+
+                    let paginaBuscada = Number(document.getElementById("buscarPaginaEspecifica").value);
+
+                    const xhttp = new XMLHttpRequest();    
+                    xhttp.open("POST", "http://localhost:3000/api/buscarPaginaEspecifica", true); 
+                    xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+                    
+                    xhttp.onreadystatechange = function() 
+                    {         
+                        if (this.readyState == 4 && this.status == 200)
+                        {
+                            if(this.response != '') 
+                            {
+                                document.getElementById("tablaRevistas").innerHTML = this.response;
+                                
+                                document.getElementById("paginaActual").innerText = paginaBuscada;
+                            }
+                        }
+                    };
+
+                    let body = JSON.stringify({tituloSitioWeb: "${tituloSitioWeb}", paginaBuscada: paginaBuscada});
+                    xhttp.send(body);
+                });
+
+            </script>
+
 
             <script>
-                let paginaActual   = Number(document.getElementById("paginaActual").innerText);
-
+                
                 document.getElementById("botonAnterior").addEventListener("click", function(){
+
+                    let paginaActual   = Number(document.getElementById("paginaActual").innerText);
 
                     const xhttp = new XMLHttpRequest();    
                     xhttp.open("POST", "http://localhost:3000/api/paginaAnterior", true); 
@@ -160,8 +193,13 @@ function armarHTML(archivoJSON, tituloSitioWeb){
                     xhttp.send(body);
                 });
 
+            </script>
+
+            <script>
 
                 document.getElementById("botonSiguiente").addEventListener("click", function(){
+
+                    let paginaActual   = Number(document.getElementById("paginaActual").innerText);
 
                     const xhttp = new XMLHttpRequest();    
                     xhttp.open("POST", "http://localhost:3000/api/paginaSiguiente", true); 
@@ -184,9 +222,73 @@ function armarHTML(archivoJSON, tituloSitioWeb){
                     let body = JSON.stringify({tituloSitioWeb: "${tituloSitioWeb}", paginaActual: paginaActual});
                     xhttp.send(body);
                 });
+
             </script>
 
+            <script>
 
+                document.getElementById("botonPrimeraPagina").addEventListener("click", function(){
+                    
+                    let paginaActual   = Number(document.getElementById("paginaActual").innerText);
+
+                    const xhttp = new XMLHttpRequest();    
+                    xhttp.open("POST", "http://localhost:3000/api/primeraPagina", true); 
+                    xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+                    
+                    xhttp.onreadystatechange = function() 
+                    {         
+                        if (this.readyState == 4 && this.status == 200)
+                        {
+                            if(this.response != '') {
+
+                                document.getElementById("tablaRevistas").innerHTML = this.response;
+                                
+                                document.getElementById("paginaActual").innerText = 1;
+                            }
+                        }
+                    };
+
+                    let body = JSON.stringify({tituloSitioWeb: "${tituloSitioWeb}"});
+                    xhttp.send(body);
+                });
+            
+            </script>
+
+            <script>
+
+                document.getElementById("botonUltimaPagina").addEventListener("click", function(){
+
+                    let paginaActual   = Number(document.getElementById("paginaActual").innerText);
+
+                    const xhttp = new XMLHttpRequest();    
+                    xhttp.open("POST", "http://localhost:3000/api/ultimaPagina", true); 
+                    xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+                    
+                    xhttp.onreadystatechange = function() 
+                    {         
+                        if (this.readyState == 4 && this.status == 200)
+                        {
+                            if(this.response != '') {
+
+                                document.getElementById("tablaRevistas").innerHTML = this.response;
+                                
+                                document.getElementById("paginaActual").innerText = ${cantidaPaginas};
+                            }
+                        }
+                    };
+
+                    let body = JSON.stringify({tituloSitioWeb: "${tituloSitioWeb}"});
+                    xhttp.send(body);
+                });
+
+            </script>
+    `
+
+    if(tituloSitioWeb == 'Listado de revistas') pagina += `<p>Cantidad de revistas argentinas: ${cantidadRevistas}</p>`
+    else                                        pagina += `<p>Cantidad de revistas en ${tituloSitioWeb}: ${cantidadRevistas}</p>`
+
+    pagina +=
+        `
             <p><button id="actualizarCatalogo">Actualizar catálogo de revistas</button></p>
 
             <script>

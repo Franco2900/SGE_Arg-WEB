@@ -29,7 +29,8 @@ router.post('/paginaSiguiente', function(req, res){
 
             let las20RevistasDelaPagina = [];
 
-            for(let i = paginaActual * 20; i < paginaSiguiente * 20; i++){
+            for(let i = paginaActual * 20; i < paginaSiguiente * 20; i++)
+            {
                 if(i == revistas.length)  i = paginaSiguiente * 20;
                 else                      las20RevistasDelaPagina.push(revistas[i]);
             }
@@ -51,26 +52,121 @@ router.post('/paginaAnterior', function(req, res){
     
     try
     {
-    let datos = '';
+        let datos = '';
 
-    const archivoJSON    = require(`../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`);
-    let revistas         = plantilla.crearListado(archivoJSON);
+        const archivoJSON    = require(`../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`);
+        let revistas         = plantilla.crearListado(archivoJSON);
 
-    let paginaActual = req.body.paginaActual;
-    let paginaAnterior = paginaActual - 1;
+        let paginaActual = req.body.paginaActual;
+        let paginaAnterior = paginaActual - 1;
 
-    if(paginaActual > 1){
+        if(paginaActual > 1){
+
+            let las20RevistasDelaPagina = [];
+
+            for(let i = (paginaAnterior-1) * 20; i < paginaAnterior * 20; i++){
+                las20RevistasDelaPagina.push(revistas[i]);
+            }
+
+            datos = plantilla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaAnterior);
+        }
+
+        res.send(datos);
+    }
+    catch(error)
+    {
+        console.log(error);
+    }
+
+});
+
+
+router.post('/primeraPagina', function(req, res){
+
+    try
+    {
+        let datos = '';
+
+        const archivoJSON    = require(`../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`);
+        let revistas         = plantilla.crearListado(archivoJSON);
 
         let las20RevistasDelaPagina = [];
 
-        for(let i = (paginaAnterior-1) * 20; i < paginaAnterior * 20; i++){
-            las20RevistasDelaPagina.push(revistas[i]);
+        for(let i = 0; i < 20; i++)
+        {
+            if(i == revistas.length)  i = 20;
+            else                      las20RevistasDelaPagina.push(revistas[i]);
         }
 
-        datos = plantilla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaAnterior);
+        datos = plantilla.armarTablaDeRevistas(las20RevistasDelaPagina, 1);
+
+        res.send(datos);
+    }
+    catch(error)
+    {
+        console.log(error);
     }
 
-    res.send(datos);
+});
+
+
+router.post('/ultimaPagina', function(req, res){
+
+    try
+    {
+        let datos = '';
+
+        const archivoJSON    = require(`../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`);
+        let revistas         = plantilla.crearListado(archivoJSON);
+        let cantidadRevistas = archivoJSON.length;
+        let cantidaPaginas   = Math.ceil(cantidadRevistas / 20);
+
+        let las20RevistasDelaPagina = [];
+
+        for(let i = (cantidaPaginas-1)* 20; i < cantidaPaginas * 20; i++)
+        {
+            if(i == revistas.length)  i = cantidaPaginas * 20;
+            else                      las20RevistasDelaPagina.push(revistas[i]);
+        }
+
+        datos = plantilla.armarTablaDeRevistas(las20RevistasDelaPagina, cantidaPaginas);
+
+        res.send(datos);
+    }
+    catch(error)
+    {
+        console.log(error);
+    }
+
+});
+
+
+router.post('/buscarPaginaEspecifica', function(req, res){
+
+    try
+    {
+        let datos = '';
+
+        const archivoJSON    = require(`../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`);
+        let revistas         = plantilla.crearListado(archivoJSON);
+        let cantidadRevistas = archivoJSON.length;
+        let cantidaPaginas   = Math.ceil(cantidadRevistas / 20);
+
+        let paginaBuscada = Number(req.body.paginaBuscada);
+        let las20RevistasDelaPagina = [];
+
+        if(paginaBuscada >= 1 && paginaBuscada <= cantidaPaginas)
+        {
+            for(let i = (paginaBuscada-1)* 20; i < paginaBuscada * 20; i++)
+            {
+                if(i == revistas.length)  i = paginaBuscada * 20;
+                else                      las20RevistasDelaPagina.push(revistas[i]);
+            }
+
+            datos = plantilla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaBuscada);
+        }
+
+        res.send(datos);
     }
     catch(error)
     {
@@ -155,6 +251,7 @@ router.get('/descargarCSV', function(req, res){
     
     res.download(path.join(__dirname, `../SGE_Arg/Revistas/${req.query.archivoCSV}.csv`));
 });
+
 
 router.get('/descargarJSON', function(req, res){
     
