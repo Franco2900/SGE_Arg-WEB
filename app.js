@@ -19,6 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use("/images", express.static(path.join(__dirname, "/public/images")));           // Indico en que path esta la carpeta de imágenes
+app.use("/javascripts", express.static(path.join(__dirname, "/public/javascripts"))); // Indico en que path esta la carpeta de archivos javascripts de lado del cliente
 app.use("/stylesheets", express.static(path.join(__dirname, "/public/stylesheets"))); // Indico en que path esta la carpeta de hojas de estilo
 
 // Indicamos que en dicha url use dicho archivo

@@ -31,14 +31,14 @@ function crearListado(archivoJSON){
 function armarTablaDeRevistas(arregloRevistas, numeroPagina){
 
     let tabla = 
-    `<table id="tablaRevistas" border="1">
+    `<table id="tablaRevistas" border="1" class="table table-light table-striped table-bordered">
         <thead>
             <tr>
-                <th>N° Revista</th>
-                <th>Titulo</th>
-                <th>ISSN impreso</th>
-                <th>ISSN electronico</th>
-                <th>Instituto/Editorial</th>
+                <th class="text-center">N° Revista</th>
+                <th class="text-center">Titulo</th>
+                <th class="text-center">ISSN impreso</th>
+                <th class="text-center">ISSN electronico</th>
+                <th class="text-center">Instituto/Editorial</th>
             </tr>
         </thead>`
 
@@ -46,10 +46,10 @@ function armarTablaDeRevistas(arregloRevistas, numeroPagina){
 
     for(let i = 0; i < arregloRevistas.length; i++){
         tabla += `<tr>
-                    <td style="text-align: center;">${numeroPagina}</td>
+                    <td class="text-center">${numeroPagina}</td>
                     <td>${arregloRevistas[i].tituloRevista}</td>
-                    <td style="text-align: center;">${arregloRevistas[i].issnImpreso}</td>
-                    <td style="text-align: center;">${arregloRevistas[i].issnEnLinea}</td>
+                    <td class="text-center">${arregloRevistas[i].issnImpreso}</td>
+                    <td class="text-center">${arregloRevistas[i].issnEnLinea}</td>
                     <td>${arregloRevistas[i].instituto}</td>
                  </tr>`
         
@@ -81,37 +81,26 @@ function armarHTML(archivoJSON, tituloSitioWeb){
     `<!DOCTYPE html>
     <html>
         <head>
+
             <title id="titulo">${tituloSitioWeb}</title>
+
             <link rel="stylesheet" type="text/css" href="/stylesheets/estilos.css">
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        
         </head>
-        <body class='fondoClaro'>
+        <body class='fondoClaro container-fluid'>
+
             <h1 style="text-align: center;">${tituloSitioWeb}</h1>
 
             <button id="botonCambiarFondo">Modo claro</button>
-            <button id="botonDescargarCSV"><a href="http://localhost:3000/api/descargarCSV?archivoCSV=${tituloSitioWeb}">Descargar CSV</a></button>
-            <button id="botonDescargarJSON"><a href="http://localhost:3000/api/descargarJSON?archivoJSON=${tituloSitioWeb}">Descargar JSON</a></button>
 
-            <script>
-                let botonCambiarFondo = document.getElementById("botonCambiarFondo");
-                
-                botonCambiarFondo.addEventListener("click", function(){
-                    
-                    if(botonCambiarFondo.innerText == "Modo claro") 
-                    {
-                        botonCambiarFondo.innerText = "Modo oscuro";
-                        document.getElementsByTagName("body")[0].classList.remove('fondoClaro');
-                        document.getElementsByTagName("body")[0].classList.add('fondoOscuro');
-                    }
-                    else 
-                    {
-                        botonCambiarFondo.innerText = "Modo claro";
-                        document.getElementsByTagName("body")[0].classList.remove('fondoOscuro');
-                        document.getElementsByTagName("body")[0].classList.add('fondoClaro');
-                    }
-                
-                });
+            <button id="botonDescargarCSV">
+                <a href="http://localhost:3000/api/descargarCSV?archivoCSV=${tituloSitioWeb}">Descargar CSV</a>
+            </button>
 
-            </script>
+            <button id="botonDescargarJSON">
+                <a href="http://localhost:3000/api/descargarJSON?archivoJSON=${tituloSitioWeb}">Descargar JSON</a>
+            </button>
     `
 
     if(tituloSitioWeb == 'Listado de revistas') pagina +=  `<p>Estas son todas las revistas argentinas que se pudieron encontrar en todos los sitios web</p>`
@@ -119,11 +108,10 @@ function armarHTML(archivoJSON, tituloSitioWeb){
             
     pagina += 
     `
-        <p>Página <span id="paginaActual">1</span> de ${cantidaPaginas}</p>
+        <p>Página <span id="paginaActual">1</span> de <span id="cantidaPaginas">${cantidaPaginas}</span></p>
 
         <button id="botonPrimeraPagina"> <<< </button>
         <button id="botonAnterior">       <  </button>
-        <!-- <input id="buscarPaginaEspecifica" type="number" min="1" max="${cantidaPaginas}" placeholder="Ingrese página a buscar"> -->
         <input id="buscarPaginaEspecifica" type="number" placeholder="Ingrese página a buscar">
         <button id="botonSiguiente">      >  </button>
         <button id="botonUltimaPagina">  >>> </button>     
@@ -133,157 +121,6 @@ function armarHTML(archivoJSON, tituloSitioWeb){
 
     pagina += armarTablaDeRevistas(primeras20Revistas, 1);
 
-    pagina +=
-    `
-            <script>
-
-                document.getElementById("buscarPaginaEspecifica").addEventListener("change", function(){
-
-                    let paginaBuscada = Number(document.getElementById("buscarPaginaEspecifica").value);
-
-                    const xhttp = new XMLHttpRequest();    
-                    xhttp.open("POST", "http://localhost:3000/api/buscarPaginaEspecifica", true); 
-                    xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-                    
-                    xhttp.onreadystatechange = function() 
-                    {         
-                        if (this.readyState == 4 && this.status == 200)
-                        {
-                            if(this.response != '') 
-                            {
-                                document.getElementById("tablaRevistas").innerHTML = this.response;
-                                
-                                document.getElementById("paginaActual").innerText = paginaBuscada;
-                            }
-                        }
-                    };
-
-                    let body = JSON.stringify({tituloSitioWeb: "${tituloSitioWeb}", paginaBuscada: paginaBuscada});
-                    xhttp.send(body);
-                });
-
-            </script>
-
-
-            <script>
-                
-                document.getElementById("botonAnterior").addEventListener("click", function(){
-
-                    let paginaActual   = Number(document.getElementById("paginaActual").innerText);
-
-                    const xhttp = new XMLHttpRequest();    
-                    xhttp.open("POST", "http://localhost:3000/api/paginaAnterior", true); 
-                    xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-                    
-                    xhttp.onreadystatechange = function() 
-                    {         
-                        if (this.readyState == 4 && this.status == 200)
-                        {
-                            if(this.response != '') {
-
-                                document.getElementById("tablaRevistas").innerHTML = this.response;
-                                
-                                paginaActual--;
-                                document.getElementById("paginaActual").innerText = paginaActual;
-                            }
-                        }
-                    };
-
-                    let body = JSON.stringify({tituloSitioWeb: "${tituloSitioWeb}", paginaActual: paginaActual});
-                    xhttp.send(body);
-                });
-
-            </script>
-
-            <script>
-
-                document.getElementById("botonSiguiente").addEventListener("click", function(){
-
-                    let paginaActual   = Number(document.getElementById("paginaActual").innerText);
-
-                    const xhttp = new XMLHttpRequest();    
-                    xhttp.open("POST", "http://localhost:3000/api/paginaSiguiente", true); 
-                    xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-                    
-                    xhttp.onreadystatechange = function() 
-                    {         
-                        if (this.readyState == 4 && this.status == 200)
-                        {
-                            if(this.response != '') {
-
-                                document.getElementById("tablaRevistas").innerHTML = this.response;
-                                
-                                paginaActual++;
-                                document.getElementById("paginaActual").innerText = paginaActual;
-                            }
-                        }
-                    };
-
-                    let body = JSON.stringify({tituloSitioWeb: "${tituloSitioWeb}", paginaActual: paginaActual});
-                    xhttp.send(body);
-                });
-
-            </script>
-
-            <script>
-
-                document.getElementById("botonPrimeraPagina").addEventListener("click", function(){
-                    
-                    let paginaActual   = Number(document.getElementById("paginaActual").innerText);
-
-                    const xhttp = new XMLHttpRequest();    
-                    xhttp.open("POST", "http://localhost:3000/api/primeraPagina", true); 
-                    xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-                    
-                    xhttp.onreadystatechange = function() 
-                    {         
-                        if (this.readyState == 4 && this.status == 200)
-                        {
-                            if(this.response != '') {
-
-                                document.getElementById("tablaRevistas").innerHTML = this.response;
-                                
-                                document.getElementById("paginaActual").innerText = 1;
-                            }
-                        }
-                    };
-
-                    let body = JSON.stringify({tituloSitioWeb: "${tituloSitioWeb}"});
-                    xhttp.send(body);
-                });
-            
-            </script>
-
-            <script>
-
-                document.getElementById("botonUltimaPagina").addEventListener("click", function(){
-
-                    let paginaActual   = Number(document.getElementById("paginaActual").innerText);
-
-                    const xhttp = new XMLHttpRequest();    
-                    xhttp.open("POST", "http://localhost:3000/api/ultimaPagina", true); 
-                    xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-                    
-                    xhttp.onreadystatechange = function() 
-                    {         
-                        if (this.readyState == 4 && this.status == 200)
-                        {
-                            if(this.response != '') {
-
-                                document.getElementById("tablaRevistas").innerHTML = this.response;
-                                
-                                document.getElementById("paginaActual").innerText = ${cantidaPaginas};
-                            }
-                        }
-                    };
-
-                    let body = JSON.stringify({tituloSitioWeb: "${tituloSitioWeb}"});
-                    xhttp.send(body);
-                });
-
-            </script>
-    `
-
     if(tituloSitioWeb == 'Listado de revistas') pagina += `<p>Cantidad de revistas argentinas: ${cantidadRevistas}</p>`
     else                                        pagina += `<p>Cantidad de revistas en ${tituloSitioWeb}: ${cantidadRevistas}</p>`
 
@@ -291,28 +128,11 @@ function armarHTML(archivoJSON, tituloSitioWeb){
         `
             <p><button id="actualizarCatalogo">Actualizar catálogo de revistas</button></p>
 
-            <script>
-                document.getElementById("actualizarCatalogo").addEventListener("click", function(){
-
-                    const xhttp = new XMLHttpRequest();    
-                    xhttp.open("POST", "http://localhost:3000/api/actualizarCatalogo", true); 
-                    xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-                    
-                    xhttp.onreadystatechange = function() 
-                    {         
-                        if (this.readyState == 4 && this.status == 200)
-                        {
-                            location.reload();
-                        }
-                    };
-
-                    let body = JSON.stringify({tituloSitioWeb: "${tituloSitioWeb}"});
-                    xhttp.send(body);
-                })
-            </script>
-
-
             <p><a href="/">Volver</a></p>
+
+            <script src="/javascripts/funcionesPlantillaRevista.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
         </body>
     </html>`
  
@@ -327,30 +147,34 @@ function armarHTMLvacio(tituloSitioWeb){
     <html>
         <head>
             <title id="titulo">${tituloSitioWeb}</title>
+
+            <link rel="stylesheet" type="text/css" href="/stylesheets/estilos.css">
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
         </head>
-        <body>
+        <body class='container-fluid'>
             <h1 style="text-align: center;">${tituloSitioWeb}</h1>
     `
-            if(tituloSitioWeb == 'Listado de revistas')
-            {
-                pagina += `<p>Todavía no esta armado el listado de revistas</p>`
-            }
-            else
-            {
-                pagina += `<p>No hay datos disponibles sobre la revista ${tituloSitioWeb}</p> `
-            }
+            
+    if(tituloSitioWeb == 'Listado de revistas') pagina += `<p>Todavía no esta armado el listado de revistas</p>`
+    else                                        pagina += `<p>No hay datos disponibles sobre la revista ${tituloSitioWeb}</p> `
 
+
+    pagina += 
     `    
             <p>Seleccione la opción 'Actualizar catálogo de revistas' para obtener datos</p>
             <p><button id="actualizarCatalogo">Actualizar catálogo de revistas</button></p>
 
             <script>
+
                 document.getElementById("actualizarCatalogo").addEventListener("click", function(){
 
+                    let tituloSitioWeb = document.getElementById("titulo").innerText;
+                
                     const xhttp = new XMLHttpRequest();    
                     xhttp.open("POST", "http://localhost:3000/api/actualizarCatalogo", true); 
                     xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-                        
+                    
                     xhttp.onreadystatechange = function() 
                     {         
                         if (this.readyState == 4 && this.status == 200)
@@ -358,13 +182,17 @@ function armarHTMLvacio(tituloSitioWeb){
                             location.reload();
                         }
                     };
-
-                    let body = JSON.stringify({tituloSitioWeb: "${tituloSitioWeb}"});
+                
+                    let body = JSON.stringify({tituloSitioWeb: tituloSitioWeb});
                     xhttp.send(body);
                 })
+
             </script>
 
             <p><a href="/">Volver</a></p>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
         </body>
     </html>
     `;
