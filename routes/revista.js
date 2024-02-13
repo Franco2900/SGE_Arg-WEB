@@ -64,6 +64,81 @@ router.get('/redalyc', function(req, res, next) {
 });
 
 
+router.get('/biblat', function(req, res, next) {
+
+    try{
+        const archivoJSON = require('../SGE_Arg/Revistas/Biblat.json');
+        let pagina = plantilla.armarHTML(archivoJSON, 'Biblat');
+        res.send(pagina);
+    }
+    catch(error){
+        let pagina = plantilla.armarHTMLvacio('Biblat');
+        res.send(pagina);
+    }
+});
+
+
+
+router.get('/scopus', function(req, res, next) {
+
+    try{
+        const archivoJSON = require('../SGE_Arg/Revistas/Scopus.json');
+        let pagina = plantilla.armarHTML(archivoJSON, 'Scopus');
+        res.send(pagina);
+    }
+    catch(error){
+        let pagina = plantilla.armarHTMLvacio('Scopus');
+        res.send(pagina);
+    }
+});
+
+
+
+router.get('/scielo', function(req, res, next) {
+
+    try{
+        const archivoJSON = require('../SGE_Arg/Revistas/Scielo.json');
+        let pagina = plantilla.armarHTML(archivoJSON, 'Scielo');
+        res.send(pagina);
+    }
+    catch(error){
+        let pagina = plantilla.armarHTMLvacio('Scielo');
+        res.send(pagina);
+    }
+});
+
+
+
+router.get('/wos', function(req, res, next) {
+
+    try{
+        const archivoJSON = require('../SGE_Arg/Revistas/Wos.json');
+        let pagina = plantilla.armarHTML(archivoJSON, 'Wos');
+        res.send(pagina);
+    }
+    catch(error){
+        let pagina = plantilla.armarHTMLvacio('Wos');
+        res.send(pagina);
+    }
+});
+
+
+
+router.get('/dialnet', function(req, res, next) {
+
+    try{
+        const archivoJSON = require('../SGE_Arg/Revistas/Dialnet.json');
+        let pagina = plantilla.armarHTML(archivoJSON, 'Dialnet');
+        res.send(pagina);
+    }
+    catch(error){
+        let pagina = plantilla.armarHTMLvacio('Dialnet');
+        res.send(pagina);
+    }
+});
+
+
+
 router.get('/listadoRevistas', function(req, res, next) {
 
     try

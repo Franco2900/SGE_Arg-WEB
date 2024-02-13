@@ -18,7 +18,11 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 app.use("/images", express.static(path.join(__dirname, "/public/images")));           // Indico en que path esta la carpeta de imágenes
+app.use("/revista/images", express.static(path.join(__dirname, "/public/images"))); 
+app.use("/revista/listadoRevistas/images", express.static(path.join(__dirname, "/public/images")));
+
 app.use("/javascripts", express.static(path.join(__dirname, "/public/javascripts"))); // Indico en que path esta la carpeta de archivos javascripts de lado del cliente
 app.use("/stylesheets", express.static(path.join(__dirname, "/public/stylesheets"))); // Indico en que path esta la carpeta de hojas de estilo
 

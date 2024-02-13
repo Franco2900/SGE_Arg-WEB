@@ -86,22 +86,87 @@ function armarHTML(archivoJSON, tituloSitioWeb){
 
             <link rel="stylesheet" type="text/css" href="/stylesheets/estilos.css">
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-        
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
         </head>
         <body class='fondoClaro container-fluid'>
 
             <h1 style="text-align: center;">${tituloSitioWeb}</h1>
-
-            <button id="botonCambiarFondo">Modo claro</button>
-
-            <button id="botonDescargarCSV">
-                <a href="http://localhost:3000/api/descargarCSV?archivoCSV=${tituloSitioWeb}">Descargar CSV</a>
-            </button>
-
-            <button id="botonDescargarJSON">
-                <a href="http://localhost:3000/api/descargarJSON?archivoJSON=${tituloSitioWeb}">Descargar JSON</a>
-            </button>
     `
+
+    switch(tituloSitioWeb)
+    {
+        case 'CAICYT':
+            pagina += `<img src="images/caicyt.jpg" class="mx-auto d-block"/> <br/>`;
+            break;
+        
+        case 'Latindex':
+            pagina += `<img src="images/latindex.jpg" class="mx-auto d-block" /> <br/>`;
+            break;
+
+        case 'DOAJ':
+            pagina += `<img src="images/doaj.jpg" class="mx-auto d-block" /> <br/>`;
+            break;
+        
+        case 'Redalyc':
+            pagina += `<img src="images/redalyc.jpg" class="mx-auto d-block" /> <br/>`;
+            break;
+
+        case 'Biblat':
+            pagina += `<img src="images/biblat.jpg" class="mx-auto d-block" /> <br/>`;
+            break;
+
+        case 'Scopus':
+            pagina += `<img src="images/scopus.jpg" class="mx-auto d-block" /> <br/>`;
+            break;
+
+        case 'Scielo':
+            pagina += `<img src="images/scielo.jpg" class="mx-auto d-block" /> <br/>`;
+            break;
+
+        case 'Wos':
+            pagina += `<img src="images/wos.jpg" class="mx-auto d-block" /> <br/>`;
+            break;
+
+        case 'Dialnet':
+            pagina += `<img src="images/dialnet.jpg" class="mx-auto d-block" /> <br/>`;
+            break;
+
+        case 'Listado de revistas':
+            pagina += `<img src="images/listado.png" class="mx-auto d-block" style="height: 15vh;" />
+                        <br/>`;
+            break;
+    }
+
+    pagina += 
+            `
+            <div class="row">
+
+                <div class="col-md-6 text-start">
+                    <button id="botonCambiarFondo" class="bi bi-lightbulb">Modo claro</button>
+                </div>
+
+                <div class="col-md-6 text-end">
+                    <a href="http://localhost:3000/api/descargarCSV?archivoCSV=${tituloSitioWeb}">
+                        <button id="botonDescargarCSV">
+                            Descargar CSV
+                            <span class="bi bi-download"></span>
+                        </button>
+                    </a>
+
+                    <a href="http://localhost:3000/api/descargarJSON?archivoJSON=${tituloSitioWeb}">
+                        <button id="botonDescargarJSON">
+                            Descargar JSON
+                            <span class="bi bi-download"></span>
+                        </button>
+                    </a>
+                </div>
+
+            </div>
+            <br/>
+    `
+
+    /* Poner el texto de cambiar fondo a la izquierda y los de descarga a la derecha */
 
     if(tituloSitioWeb == 'Listado de revistas') pagina +=  `<p>Estas son todas las revistas argentinas que se pudieron encontrar en todos los sitios web</p>`
     else                                        pagina +=  `<p>Estas son las revistas argentinas que se encuentran en el sitio web ${tituloSitioWeb}</p>`

@@ -4,19 +4,21 @@ botonCambiarFondo.addEventListener("click", function(){
                     
     if(botonCambiarFondo.innerText == "Modo claro") 
     {
-        botonCambiarFondo.innerText = "Modo oscuro";
-
         document.getElementsByTagName("body")[0].classList.remove('fondoClaro');
         document.getElementsByTagName("body")[0].classList.add('fondoOscuro');
+
+        botonCambiarFondo.innerText = "Modo oscuro";
+        botonCambiarFondo.setAttribute('class', 'bi bi-lightbulb-off');
 
         document.getElementById("tablaRevistas").setAttribute('class', 'table table-dark table-striped table-bordered');
     }
     else 
     {
-        botonCambiarFondo.innerText = "Modo claro";
-        
         document.getElementsByTagName("body")[0].classList.remove('fondoOscuro');
         document.getElementsByTagName("body")[0].classList.add('fondoClaro');
+
+        botonCambiarFondo.innerText = "Modo claro";
+        botonCambiarFondo.setAttribute('class', 'bi bi-lightbulb');
 
         document.getElementById("tablaRevistas").setAttribute('class', 'table table-light table-striped table-bordered');
     }
