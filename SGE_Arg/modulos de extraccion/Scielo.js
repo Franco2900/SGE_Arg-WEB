@@ -91,39 +91,39 @@ async function extraerInfoRevista(urls) {
     const textContent = spanElement.textContent;
 
     // Crear patrones para extraer los ISSN
-    const printPattern = /versión\s+impresa\s+ISSN\s+([\d-]+)/i;
-    const onlinePattern = /versión\s+On-line\s+ISSN\s+([\d-]+)/i;
+    const printPattern = /versión\s+impresa\s+ISSN\s+(....-....)/i;
+    const onlinePattern = /versión\s+On-line\s+ISSN\s+(....-....)/i;
 
-    const issn = textContent.match(printPattern);
-    const issn_e = textContent.match(onlinePattern);
+    const issnImpreso = textContent.match(printPattern);
+    const issnEnLinea = textContent.match(onlinePattern);
 
-    return [issn ? issn[1] : null, issn_e ? issn_e[1] : null];
+    return [issnImpreso ? issnImpreso[1] : '', issnEnLinea ? issnEnLinea[1] : ''];
   });
 
-  const [issn, issn_e] = issnMatches; 
+  const [issnImpreso, issnEnLinea] = issnMatches; 
 
       // Extraer el texto de la etiqueta <span class="titulo">Salud colectiva</span>
-      const revista = await page.evaluate(() => {
+      const titulo = await page.evaluate(() => {
         const imgElement = document.querySelector(".journalLogo img");
         return imgElement ? imgElement.alt : null;
       });
 
       // Extrae el valor de la etiqueta <strong>
-      const institucion = await page.evaluate(() => {
+      const instituto = await page.evaluate(() => {
         const titleElement = document.querySelector(".journalTitle");
         return titleElement ? titleElement.innerText.trim() : null;
       });
 
-      console.log("Valor de ISSN:", issn);
-      console.log("Valor de ISSN-e:", issn_e);
-      console.log("INSTITUCION:", institucion);
-      console.log("REVISTA: ", revista);
+      console.log("Valor de ISSN:", issnImpreso);
+      console.log("Valor de ISSN-e:", issnEnLinea);
+      console.log("INSTITUCION:", instituto);
+      console.log("REVISTA: ", titulo);
 
       registros.push({
-        revista,
-        institucion,
-        issn,
-        issn_e,
+        titulo,
+        instituto,
+        issnImpreso,
+        issnEnLinea,
       });
     } catch (error) {
       console.error(`Error al procesar enlace: ${url}`);
@@ -155,10 +155,10 @@ async function extraerInfoScielo() {
 
  // Crear archivo CSV
  const csvData = registros
-   .map((registro) => `${registro.revista};${registro.institucion};${registro.issn};${registro.issn_e}`)
+   .map((registro) => `${registro.titulo};${registro.instituto};${registro.issnImpreso};${registro.issnEnLinea}`)
    .join("\n");
  const csvFilePath = "./Revistas/Scielo.csv";
- fs.writeFileSync(csvFilePath, `Revista;Institucion;ISSN;ISSN-e\n${csvData}`);
+ fs.writeFileSync(csvFilePath, `Titulo;Instituto;ISSN;ISSN-e\n${csvData}`);
  console.log(`Archivo CSV creado: ${csvFilePath}`);
 
  console.log("Termina la extracción de datos de Scielo");
