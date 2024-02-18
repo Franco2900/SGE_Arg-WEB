@@ -2,7 +2,7 @@ const fs             = require('fs');        // Módulo para leer y escribir arc
 const puppeteer      = require('puppeteer'); // Módulo para web scrapping
 const jsdom          = require('jsdom');     // Módulo para filtrar la información extraida con web scrapping
 
-// Busco cuantas páginas devuelve la consulta a Latindex (cada página tiene entre 1 y 20 revistas)
+// Busco cuantas páginas devuelve la consulta a Biblat
 async function obtenerPaths() {
   try {
     const browser = await puppeteer.launch({ headless: "new" });
@@ -11,6 +11,7 @@ async function obtenerPaths() {
 
     await page.goto('https://biblat.unam.mx/es/');
 
+    // Para consultar las revistas de argentina, se debe indicar tal pais en un componente dinamico
     // Espero a que el selector esté presente en la página
     await page.waitForSelector('path.highcharts-point.highcharts-name-argentina.highcharts-key-ar');
     await page.waitForTimeout(2000);
@@ -31,6 +32,7 @@ async function obtenerPaths() {
     await page.waitForSelector('div.dataTables_scrollBody');
     await page.waitForTimeout(3000);
 
+    //reviso la tabla de revistas argentina y genero los paths
     const hrefs = await page.evaluate(() => {
       const hrefArray = [];
       const rows = document.querySelectorAll('#bodyRevista tr');
@@ -83,6 +85,7 @@ async function buscarEnlacesARevistas(paths) {
       } catch (error) {
         console.error('Error en page.goto para el path:', path, error.message);
         // Continúa con el siguiente path si hay un error de tiempo de espera
+        //Aqui, deberia almacenar el path para luego reintentar la extraccion
         continue;
       }
     }
@@ -114,18 +117,17 @@ async function extraerInfoRevista(enlaces) {
     //var filtroHTML  = document.getElementById("rev-linea");
     var filtro2HTML = document.getElementsByClassName("table table-striped ")[0];
     const tabla1    = filtro2HTML.querySelectorAll("tbody tr td");
-   var revista    = null;
+   var titulo    = null;
    var issn      = null;
-   var pais      = null;
+   
    for ( i =0; i<tabla1.length;i++){
     //console.log("CONTENIDO: "+tabla1[i].textContent)
-     if (tabla1[i].textContent === "Revista:") revista = tabla1[i+1].textContent ;
+     if (tabla1[i].textContent === "Revista:") titulo = tabla1[i+1].textContent ;
      if (tabla1[i].textContent === "ISSN:") issn = tabla1[i+1].textContent ;
-     if (tabla1[i].textContent === "País:") pais = tabla1[i+1].textContent ;
     }
     
       //console.log("REGISTROS: "+revista+" "+issn);
-      registros.push({ revista, issn , pais});
+      registros.push({ titulo, issn });
     } catch (error) {
       console.error(`Error al procesar enlace: ${enlace}`);
       console.error(error);
@@ -154,13 +156,13 @@ async function extraerInfoBiblat() {
 
   // Crear archivo JSON
   const jsonFilePath = './Revistas/Biblat.json';
-  fs.writeFileSync(jsonFilePath, JSON.stringify(registros, null, 3));
+  fs.writeFileSync(jsonFilePath, JSON.stringify(registros, null, 2));
   console.log(`Archivo JSON creado: ${jsonFilePath}`);
 
   // Crear archivo CSV
-  const csvData = registros.map(registro => `${registro.revista};${registro.issn};${registro.pais}`).join('\n');
+  const csvData = registros.map(registro => `${registro.titulo};${registro.issn}`).join('\n');
   const csvFilePath = './Revistas/Biblat.csv';
-  fs.writeFileSync(csvFilePath, `Título;ISSN;Pais\n${csvData}`);
+  fs.writeFileSync(csvFilePath, `Título;ISSN\n${csvData}`);
   console.log(`Archivo CSV creado: ${csvFilePath}`);
 
   console.log("Termina la extracción de datos de Biblat");
