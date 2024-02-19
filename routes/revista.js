@@ -112,12 +112,12 @@ router.get('/scielo', function(req, res, next) {
 router.get('/wos', function(req, res, next) {
 
     try{
-        const archivoJSON = require('../SGE_Arg/Revistas/Wos.json');
-        let pagina = plantilla.armarHTML(archivoJSON, 'Wos');
+        const archivoJSON = require('../SGE_Arg/Revistas/WoS.json');
+        let pagina = plantilla.armarHTML(archivoJSON, 'WoS');
         res.send(pagina);
     }
     catch(error){
-        let pagina = plantilla.armarHTMLvacio('Wos');
+        let pagina = plantilla.armarHTMLvacio('WoS');
         res.send(pagina);
     }
 });

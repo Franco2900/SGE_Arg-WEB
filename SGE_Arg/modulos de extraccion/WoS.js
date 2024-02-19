@@ -107,8 +107,8 @@ for (const element of elements) {
 
   // Crea un objeto con la información y agrégalo a la lista
   const objeto = {
-    titulo,
-    instituto,
+    Título: titulo,
+    Instituto: instituto,
     issnImpreso,
     issnEnLinea,
   };
@@ -154,22 +154,21 @@ for (const element of elements) {
 
 // Extraigo la info de todas las revistas de la consulta
 async function extraerInfoWoS() {
-
-    const listaDeRevistas = await extraerInfoRevistas();
-    console.log("CANTIDAD DE REVISTAS: " + listaDeRevistas.length);
+  
+  const listaDeRevistas = await extraerInfoRevistas();
+  console.log("CANTIDAD DE REVISTAS: " + listaDeRevistas.length);
   // Crear archivo JSON
-  const jsonFilePath = './Revistas/WoS.json';
+  const jsonFilePath = './SGE_Arg/Revistas/WoS.json';
   fs.writeFileSync(jsonFilePath, JSON.stringify(listaDeRevistas, null, 4));
   console.log(`Archivo JSON creado: ${jsonFilePath}`);
 
   // Crear archivo CSV
-  const csvData = listaDeRevistas.map(registro => `${registro.titulo};${registro.instituto};${registro.issnImpreso};${registro.issnEnLinea}`).join('\n');
-  const csvFilePath = './Revistas/WoS.csv';
+  const csvData = listaDeRevistas.map(registro => `${registro.Título};${registro.Instituto};${registro.issnImpreso};${registro.issnEnLinea}`).join('\n');
+  const csvFilePath = './SGE_Arg/Revistas/WoS.csv';
   fs.writeFileSync(csvFilePath, `Título;INSTITUTO;ISSN;EISSN\n${csvData}`);
   console.log(`Archivo CSV creado: ${csvFilePath}`);
 
   console.log("Termina la extracción de datos de WoS");
-
-    }
+}
     
-    exports.extraerInfoWoS = extraerInfoWoS;
+exports.extraerInfoWoS = extraerInfoWoS;

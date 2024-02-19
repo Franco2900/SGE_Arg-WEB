@@ -205,6 +205,10 @@ router.post('/actualizarCatalogo', function(req, res){
                 archivoDeExtraccion.extraerInfoDOAJ();
                 break;
     
+            case 'WoS':
+                archivoDeExtraccion.extraerInfoWoS();
+                break;
+
             case 'Listado de revistas':
                 let archivoArmadoDeListado = require('../SGE_Arg/listadoRevistas.js');
                 archivoArmadoDeListado.crearListado();

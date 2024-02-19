@@ -124,7 +124,7 @@ function armarHTML(archivoJSON, tituloSitioWeb){
             pagina += `<img src="images/scielo.jpg" class="mx-auto d-block" /> <br/>`;
             break;
 
-        case 'Wos':
+        case 'WoS':
             pagina += `<img src="images/wos.jpg" class="mx-auto d-block" /> <br/>`;
             break;
 
