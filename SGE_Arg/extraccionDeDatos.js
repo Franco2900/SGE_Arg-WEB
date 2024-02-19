@@ -9,9 +9,12 @@ const Latindex = require('./modulos de extraccion/Latindex.js');
 const CAICYT   = require('./modulos de extraccion/CAICYT.js');
 const Biblat   = require('./modulos de extraccion/Biblat.js');
 const Redalyc  = require('./modulos de extraccion/Redalyc.js');
+const Scielo  = require('./modulos de extraccion/Scielo.js');
+const WoS  = require('./modulos de extraccion/WoS.js');
+const Scimagojr  = require('./modulos de extraccion/Scimagojr.js');
 
 // APIs (los brindan los sitios web)
-const DOAJ = require('./APIs/DOAJ API.js');
+//const DOAJ = require('./APIs/DOAJ API.js');
 
 
 // Extracción de datos
@@ -21,6 +24,7 @@ const DOAJ = require('./APIs/DOAJ API.js');
 //Latindex.extraerInfoLatindex();
 //Latindex.extraerInfoLatindexLite();
 //DOAJ.extraerInfoDOAJ();
-//Biblat.extraerInfoBiblat(puppeteer, jsdom, fs);
 //Biblat.extraerInfoBiblat();
-
+//Scielo.extraerInfoScielo();
+//WoS.extraerInfoWoS();
+Scimagojr.extraerInfoScimagojr();
