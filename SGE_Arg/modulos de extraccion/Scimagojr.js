@@ -9,7 +9,7 @@ async function descargarArchivo() {
     const response = await axios.get(url, { responseType: 'arraybuffer' });
 
     // Crear archivo XLS
-    const xlsFilePath = "./Revistas/Scimagojr.xls";
+    const xlsFilePath = "./SGE_Arg/Revistas/Scimagojr.xls";
     fs.writeFileSync(xlsFilePath, response.data);
     console.log(`Archivo CSV creado: ${xlsFilePath}`);
 
@@ -53,7 +53,7 @@ async function descargarArchivo() {
           resultados.push(objetoResultado);
         }
     }
-  //console.log(resultados);
+  console.log(resultados);
   return resultados;
 
   } catch (error) {
@@ -67,13 +67,13 @@ async function extraerInfoScimagojr() {
   const listaDeRevistas = await descargarArchivo();
   console.log("CANTIDAD DE REVISTAS: " + listaDeRevistas.length);
   // Crear archivo JSON
-  const jsonFilePath = './Revistas/Scopus.json';
+  const jsonFilePath = './SGE_Arg/Revistas/Scopus.json';
   fs.writeFileSync(jsonFilePath, JSON.stringify(listaDeRevistas, null, 4));
   console.log(`Archivo JSON creado: ${jsonFilePath}`);
 
   // Crear archivo CSV
   const csvData = listaDeRevistas.map(registro => `${registro.titulo};${registro.instituto};${registro.issnImpreso};${registro.issnEnLinea}`).join('\n');
-  const csvFilePath = './Revistas/Scopus.csv';
+  const csvFilePath = './SGE_Arg/Revistas/Scopus.csv';
   fs.writeFileSync(csvFilePath, `Título;INSTITUTO;ISSN;EISSN\n${csvData}`);
   console.log(`Archivo CSV creado: ${csvFilePath}`);
   console.log("Termina la extracción de datos de Scopus");
