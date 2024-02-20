@@ -60,6 +60,25 @@ async function extraerInfoRevistas() {
    console.log('No se encontró el país ARGENTINA en la lista.');
  }
 
+  //Se selecciona la mayor cantidad de revistas por pagina
+ //para reducir el tiempo de extraccion
+ const selector = 'body > cdx-app > mat-sidenav-container > mat-sidenav-content > main > can-home-page > div > div > div > mat-sidenav-container > mat-sidenav-content > app-journal-search-results > div:nth-child(3) > div:nth-child(11) > mat-paginator > div > div > div.mat-paginator-page-size.ng-star-inserted > mat-form-field';
+ const opcion50 = '/html/body/div[5]/div[2]/div/div/div/mat-option[3]';
+ //await page.waitForSelector('.mat-form-field');
+ await page.waitForSelector(selector);
+ await page.click(selector);
+ console.log('clic en selector de cantidad de revistas por pagina');
+    // Esperar a que el componente esté presente en el DOM
+    await page.waitForXPath(opcion50);
+
+    // Realizar clic en el componente
+    const [componente] = await page.$x(opcion50);
+    if (componente) {
+      await componente.click();
+      console.log('Clic en el opcion de 50 revistas.');
+    } else {
+      console.error('No se encontró el componente en la página.');
+    }
  // Lista para almacenar objetos
  const listaDeRevistas = [];
  let actual, total;
@@ -141,8 +160,9 @@ for (const element of elements) {
   
   
    await page.waitForTimeout(2000);
-    const next = "body > cdx-app > mat-sidenav-container > mat-sidenav-content > main > can-home-page > div > div > div > mat-sidenav-container > mat-sidenav-content > app-journal-search-results > div:nth-child(3) > div:nth-child(11) > mat-paginator > div > div > div.mat-paginator-range-actions > button.mat-focus-indicator.mat-tooltip-trigger.mat-paginator-navigation-next.mat-icon-button.mat-button-base";
-   if (actual !== total) await page.click(next);
+   const next50 = "body > cdx-app > mat-sidenav-container > mat-sidenav-content > main > can-home-page > div > div > div > mat-sidenav-container > mat-sidenav-content > app-journal-search-results > div:nth-child(3) > div:nth-child(51) > mat-paginator > div > div > div.mat-paginator-range-actions > button.mat-focus-indicator.mat-tooltip-trigger.mat-paginator-navigation-next.mat-icon-button.mat-button-base"; 
+   //const next10 = "body > cdx-app > mat-sidenav-container > mat-sidenav-content > main > can-home-page > div > div > div > mat-sidenav-container > mat-sidenav-content > app-journal-search-results > div:nth-child(3) > div:nth-child(11) > mat-paginator > div > div > div.mat-paginator-range-actions > button.mat-focus-indicator.mat-tooltip-trigger.mat-paginator-navigation-next.mat-icon-button.mat-button-base";
+   if (actual !== total) await page.click(next50);
   }while(actual !== total);
 
  // Cerrar el navegador
