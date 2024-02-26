@@ -200,8 +200,8 @@ async function extraerInfoWoS() {
   }
 
   // Crea archivo .CSV
-  const csvFilePath  = path.join(__dirname + './SGE_Arg/Revistas/WoS.csv');
-  const jsonFilePath = path.join(__dirname + './SGE_Arg/Revistas/WoS.json');
+  const csvFilePath  = path.join(__dirname + '/../Revistas/WoS.csv');
+  const jsonFilePath = path.join(__dirname + '/../Revistas/WoS.json');
 
   console.log(csvFilePath);
   console.log(jsonFilePath);
