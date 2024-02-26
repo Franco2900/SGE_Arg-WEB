@@ -1,5 +1,8 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');        // Módulo para leer y escribir archivos
+const csvtojson  = require('csvtojson'); // Módulo para pasar texto csv a json
+const chokidar = require('chokidar'); // Módulo para detectar cambios en un archivo o la creación del mismo
+const path = require('path'); // Módulo para trabajar con rutas
 
 async function extraerInfoRevistas() {
     //esta opcion es para ver la extraccion en el navegador, es necesario en este modulo de extraccion
@@ -11,6 +14,7 @@ async function extraerInfoRevistas() {
    
   
   // Ir a la página de búsqueda
+  page.setDefaultNavigationTimeout(120000);
   await page.goto('https://mjl.clarivate.com/search-results');
   await page.waitForTimeout(8000);
   //Cerrar las cookies
@@ -178,15 +182,59 @@ async function extraerInfoWoS() {
   const listaDeRevistas = await extraerInfoRevistas();
   console.log("CANTIDAD DE REVISTAS: " + listaDeRevistas.length);
   // Crear archivo JSON
-  const jsonFilePath = './SGE_Arg/Revistas/WoS.json';
-  fs.writeFileSync(jsonFilePath, JSON.stringify(listaDeRevistas, null, 4));
+/*  const jsonFilePath = './SGE_Arg/Revistas/WoS.json';
+  fs.writeFileSync(jsonFilePath, info);
   console.log(`Archivo JSON creado: ${jsonFilePath}`);
 
   // Crear archivo CSV
   const csvData = listaDeRevistas.map(registro => `${registro.Título};${registro.Instituto};${registro.issnImpreso};${registro.issnEnLinea}`).join('\n');
   const csvFilePath = './SGE_Arg/Revistas/WoS.csv';
-  fs.writeFileSync(csvFilePath, `Título;INSTITUTO;ISSN;EISSN\n${csvData}`);
+  fs.writeFileSync(csvFilePath, `Título;Instituto;ISSN;EISSN\n${csvData}`);
   console.log(`Archivo CSV creado: ${csvFilePath}`);
+*/
+
+  // Paso los datos de los objetos a string
+  let info = "Título;ISSN impresa;ISSN en linea;Instituto" + "\n";
+  for(let i = 0; i < listaDeRevistas.length; i++){
+    info += `${listaDeRevistas[i].Título};${listaDeRevistas[i].issnImpreso};${listaDeRevistas[i].issnEnLinea};${listaDeRevistas[i].Instituto}` + "\n";
+  }
+
+  // Crea archivo .CSV
+  const csvFilePath  = path.join(__dirname + './SGE_Arg/Revistas/WoS.csv');
+  const jsonFilePath = path.join(__dirname + './SGE_Arg/Revistas/WoS.json');
+
+  console.log(csvFilePath);
+  console.log(jsonFilePath);
+  
+  // Con todos los datos en string, escribo la info en formato csv y después uso el modulo csvtojson para crear el archivo .json
+  try
+  {
+    let vigilante = fs.watch(csvFilePath, function () { // // Se ejecutara cuando detecte un cambio en el archivo (en caso de que si exista el archivo .csv)
+      
+      csvtojson({delimiter: [";"],}).fromFile(csvFilePath).then((json) => // La propiedad delimiter indica porque caracter debe separar
+      { 
+        fs.writeFileSync(jsonFilePath, JSON.stringify(json), error => {if(error) console.log(error);})
+      })
+
+      vigilante.close();
+    });
+  }
+  catch(error)
+  {
+    let vigilante = chokidar.watch(csvFilePath); // Archivo que le indico que vigile
+
+    vigilante.on('add', function(path) { // Se ejecutara cuando detecte la creación del archivo (en caso de que no exista el archivo .csv)
+    
+      csvtojson({delimiter: [";"],}).fromFile(csvFilePath).then((json) =>
+      { 
+        fs.writeFileSync(jsonFilePath, JSON.stringify(json), error => {if(error) console.log(error);})
+      })
+  
+      vigilante.close();    // Dejo de vigilar
+    });
+  }
+
+  fs.writeFileSync(csvFilePath, info); // Escribo el archivo
 
   console.log("Termina la extracción de datos de WoS");
 }

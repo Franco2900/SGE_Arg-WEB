@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 var express = require('express');
 var router = express.Router();
 
@@ -59,112 +61,122 @@ router.get('/', function(req, res, next) {
       </p>
         
       <p>Los sitios web de los que extraemos información son: </p>
-      
-      <span>
+    `
 
-        <div class="row">
+    let revistas = ['CAICYT', 'Latindex', 'DOAJ', 'Redalyc', 'Biblat', 'Scopus', 'Scielo', 'WoS', 'Dialnet'];
 
-          <div class="col-md-4 text-center">
-            <a href="/revista/caicyt">
-              <img src="images/caicyt.jpg" class="mx-auto d-block">
-              <br/>
-              CAYCIT
-            </a>
-          </div>
+    // LAS REVISTAS
+    for(let i = 0; i < revistas.length; i++){
 
-          <div class="col-md-4 text-center">
-            <a href="/revista/latindex">
-              <img src="images/latindex.jpg" class="mx-auto d-block">
-              <br/>
-              Latindex
-            </a>
-          </div>
+      if(i%3 == 0) pagina += `<div class="row">`;
 
-          <div class="col-md-4 text-center">
-            <a href="/revista/doaj">
-              <img src="images/doaj.jpg" class="mx-auto d-block">
-              <br/>
-              DOAJ
-            </a>
-          </div>
-
-        </div>
-
-        <br></br>
-
-        <div class="row">
-
-          <div class="col-md-4 text-center">
-            <a href="/revista/redalyc">
-              <img src="images/redalyc.jpg" class="mx-auto d-block" style="width: 80%;">
-              <br/>
-              Redalyc
-            </a>
-          </div>
-
-          <div class="col-md-4 text-center">
-          <a href="/revista/biblat">
-            <img src="images/biblat.jpg" class="mx-auto d-block" style="width: 80%;">
-            <br/>
-            Biblat
-          </a>
-          </div>
-
-          <div class="col-md-4 text-center">
-            <a href="/revista/scopus">
-              <img src="images/scopus.jpg" class="mx-auto d-block">
-              <br/>
-              Scopus
-            </a>
-          </div>
-
-        </div>
-
-        <br></br>
-
-        <div class="row">
-
-          <div class="col-md-4 text-center">
-            <a href="/revista/scielo">
-              <img src="images/scielo.jpg" class="mx-auto d-block">
-              </br>
-              Scielo
-            </a>
-          </div>
-
-          <div class="col-md-4 text-center">
-            <a href="/revista/wos">
-              <img src="images/wos.jpg" class="mx-auto d-block" style="width: 80%;">
-              </br>
-              Web of Science
-            </a>
-          </div>
-
-          <div class="col-md-4 text-center">
-            <a href="/revista/dialnet">
-              <img src="images/dialnet.jpg" class="mx-auto d-block">
-              <br/>
-              Dialnet
-            </a>
-          </div>
-
-        </div>
-
-        <br></br>
-
-      </span>
-        
-      <p>El listado completo de las revistas de todos los sitios web se puede ver aquí</p>
-      
-      <div class="col-md-12 text-center">
-        <a href="/revista/listadoRevistas/">
-          <img src="images/listado.png" class="mx-auto d-block" style="height: 10%; width: 20%;">
+      pagina +=
+      `
+      <div class="col-md-4 text-center">
+        <a href="/revista/${revistas[i]}">
+          <img src="images/${revistas[i]}.jpg" class="mx-auto d-block">
           <br/>
-          Listado de revistas
+          ${revistas[i]}
         </a>
       </div>
+      `
+  
+      if(i == 2 || i == 5 || i == 8) pagina += `</div> <br></br>`;
+    }
 
-      <br></br>
+
+    // EL LISTADO
+    pagina +=
+    `
+    <p>El listado completo de las revistas de todos los sitios web se puede ver aquí</p>
+      
+    <div class="text-center">
+      <a href="/revista/listadoRevistas/">
+        <img src="images/listado.png" class="mx-auto d-block" style="height: 10%; width: 20%;">
+        <br/>
+        Listado de revistas
+      </a>
+    </div>
+
+    <br></br>
+    `
+
+
+    // TABLA QUE MUESTRA EL ESTADO DE LOS ARCHIVOS
+    pagina +=
+    `
+      <table class="text-center table table-bordered">
+        <caption>Se considera que una revista tiene datos desactualizados si ya pasaron más de 30 días desde su última actualización</caption>
+        <thead>
+          <tr>
+            <th>Revista</th>
+            <th>Estado</th>
+            <th>Ultima actualización (DD/MM/YY)</th>
+          </tr>
+        </thead>
+        <tbody>
+    `  
+
+    for(let i = 0; i < revistas.length; i++){
+      
+      let fechaUltimaModicacionDelArchivo = "";
+      let colorEstadoDelArchivo = "";
+      let mensajeEstadoDelArchivo = "";
+
+      try
+      {
+        // Me fijo la fecha de modificación del archivo
+        let estadisticasDelArchivo;
+        if(revistas[i] == 'Web of Science') estadisticasDelArchivo = fs.statSync(path.join(__dirname + `/../SGE_Arg/Revistas/WoS.json`));
+        else                                estadisticasDelArchivo = fs.statSync(path.join(__dirname + `/../SGE_Arg/Revistas/${revistas[i]}.json`));
+        
+        let fechaModicacion = estadisticasDelArchivo.mtime;
+        fechaUltimaModicacionDelArchivo = `${fechaModicacion.getDate()}/${fechaModicacion.getMonth()+1}/${fechaModicacion.getFullYear()}`;
+        // getMonth() devuelve un valor entre 0 y 11, siendo 0 el mes de Enero; por eso se le suma uno
+
+        // Me fijo el estado del archivo. Verde para datos actualizados, amarillo para datos desactualizados y rojo para cuando no hay datos
+        let fechaActual = new Date();
+
+        let diferenciaDeTiempo = (fechaActual.getFullYear() - fechaModicacion.getFullYear() ) * 12; // A la diferencia en años la multiplicamos por 12 para tener la diferencia en meses
+        diferenciaDeTiempo += fechaActual.getMonth()+1;     // Le sumo los meses actuales
+        diferenciaDeTiempo -= fechaModicacion.getMonth()+1; // Le resto los meses que ya pasaron
+        diferenciaDeTiempo *= 30  // A la diferencia en meses la multiplicamos por 30 para tener la diferencia en días
+
+        if(diferenciaDeTiempo > 30) 
+        {
+          colorEstadoDelArchivo = 'yellow';
+          mensajeEstadoDelArchivo = 'Datos desactualizados';
+        }
+        else
+        {
+          colorEstadoDelArchivo = 'green';
+          mensajeEstadoDelArchivo = 'Datos al día';
+        }
+
+      }
+      catch(error)
+      {
+        mensajeEstadoDelArchivo = 'No hay datos disponibles';
+        colorEstadoDelArchivo = 'red';
+      }
+                                                       
+
+      pagina += 
+      `
+      <tr>
+        <td>${revistas[i]}</td>
+        <td style="background-color: ${colorEstadoDelArchivo};">${mensajeEstadoDelArchivo}</td>
+        <td>${fechaUltimaModicacionDelArchivo}</td>
+      </tr>
+      `
+    }
+
+    pagina +=
+    `
+        </tbody>
+      </table>
+
+      <br/>
 
     </body>
   </html>

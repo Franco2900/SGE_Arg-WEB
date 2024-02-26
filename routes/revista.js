@@ -7,6 +7,8 @@ const plantilla = require('./plantillaRevista.js') // Arma el HTML de las revist
 // ENRUTAMIENTO: MANEJO DE PETICIONES GET
 /*****************************************************************************************************************************/
 
+// Las rutas no son sensibles a las mayusculas y minusculas, por lo que se las puede llamar más facilmente
+
 router.get('/caicyt', function(req, res, next) {
 
     try{
@@ -109,7 +111,7 @@ router.get('/scielo', function(req, res, next) {
 
 
 
-router.get('/wos', function(req, res, next) {
+router.get('/WoS', function(req, res, next) {
 
     try{
         const archivoJSON = require('../SGE_Arg/Revistas/WoS.json');

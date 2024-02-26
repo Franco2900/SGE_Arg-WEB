@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 // Clase para pasar el texto de los archivos JSON a objetos
 class Revista {
     
@@ -94,6 +96,7 @@ function armarHTML(archivoJSON, tituloSitioWeb){
             <h1 style="text-align: center;">${tituloSitioWeb}</h1>
     `
 
+    // Cambiar a algo más simple para ahorrar lineas <img src="images/${tituloSitioWeb}.jpg">
     switch(tituloSitioWeb)
     {
         case 'CAICYT':
@@ -125,7 +128,7 @@ function armarHTML(archivoJSON, tituloSitioWeb){
             break;
 
         case 'WoS':
-            pagina += `<img src="images/wos.jpg" class="mx-auto d-block" /> <br/>`;
+            pagina += `<img src="images/WoS.jpg" class="mx-auto d-block" /> <br/>`;
             break;
 
         case 'Dialnet':
@@ -189,8 +192,12 @@ function armarHTML(archivoJSON, tituloSitioWeb){
     if(tituloSitioWeb == 'Listado de revistas') pagina += `<p>Cantidad de revistas argentinas: ${cantidadRevistas}</p>`
     else                                        pagina += `<p>Cantidad de revistas en ${tituloSitioWeb}: ${cantidadRevistas}</p>`
 
+    let estadisticasDelArchivo = fs.statSync(`./SGE_Arg/Revistas/${tituloSitioWeb}.json`);
+    let fechaUltimaModicacion = estadisticasDelArchivo.mtime;
+
     pagina +=
         `
+            <p>Última actualización: ${fechaUltimaModicacion.getDate()}/${fechaUltimaModicacion.getMonth()}/${fechaUltimaModicacion.getFullYear()} (DD/MM/YY)</p>
             <p><button id="actualizarCatalogo">Actualizar catálogo de revistas</button></p>
 
             <p><a href="/">Volver</a></p>

@@ -1,3 +1,7 @@
 Cuando extraemos los datos tenemos que usar los mismos nombres de variables en todos los archivos
 
 Fijarse como mejorar la velocidad de extracción de datos
+
+Hay scripts que esperan un tiempo determinado para continuar la ejecución. Hay que actualizarlos con el módulo chokidar que sirve especificamente para ejecutar código cuando detecta cambios en un archivo
+
+Cuando se quiere extraer y se pasa de los 30 segundos de espera para conectarse, tambien se cae el sitio web
