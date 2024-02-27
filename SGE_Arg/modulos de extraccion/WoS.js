@@ -199,14 +199,10 @@ async function extraerInfoWoS() {
     info += `${listaDeRevistas[i].Título};${listaDeRevistas[i].issnImpreso};${listaDeRevistas[i].issnEnLinea};${listaDeRevistas[i].Instituto}` + "\n";
   }
 
-  // Crea archivo .CSV
   const csvFilePath  = path.join(__dirname + '/../Revistas/WoS.csv');
   const jsonFilePath = path.join(__dirname + '/../Revistas/WoS.json');
 
-  console.log(csvFilePath);
-  console.log(jsonFilePath);
-  
-  // Con todos los datos en string, escribo la info en formato csv y después uso el modulo csvtojson para crear el archivo .json
+  // Con todos los datos en string, escribo la info en formato .csv y después uso el modulo csvtojson para crear el archivo .json
   try
   {
     let vigilante = fs.watch(csvFilePath, function () { // // Se ejecutara cuando detecte un cambio en el archivo (en caso de que si exista el archivo .csv)

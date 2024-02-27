@@ -1,6 +1,10 @@
 const fs = require("fs"); // Módulo para leer y escribir archivos
 const puppeteer = require("puppeteer"); // Módulo para web scrapping
 const jsdom = require("jsdom"); // Módulo para filtrar la información extraida con web scrapping
+const path = require('path'); // Módulo para trabajar con rutas
+const chokidar = require('chokidar'); // Módulo para detectar cambios en un archivo o la creación del mismo
+const csvtojson  = require('csvtojson'); // Módulo para pasar texto csv a json
+
 
 // Busco cuantas páginas devuelve la consulta a Latindex (cada página tiene entre 1 y 20 revistas)
 async function obtenerUrls() {
@@ -149,7 +153,7 @@ async function extraerInfoScielo() {
   console.log("REGISTROS OBTENIDOS: " + registros.length);
 
  // Crear archivo JSON
- const jsonFilePath = "./Revistas/Scielo.json";
+ /*const jsonFilePath = "./Revistas/Scielo.json";
  fs.writeFileSync(jsonFilePath, JSON.stringify(registros, null, 4));
  console.log(`Archivo JSON creado: ${jsonFilePath}`);
 
@@ -159,7 +163,46 @@ async function extraerInfoScielo() {
    .join("\n");
  const csvFilePath = "./Revistas/Scielo.csv";
  fs.writeFileSync(csvFilePath, `Titulo;Instituto;ISSN;ISSN-e\n${csvData}`);
- console.log(`Archivo CSV creado: ${csvFilePath}`);
+ console.log(`Archivo CSV creado: ${csvFilePath}`);*/
+
+  // Paso los datos de los objetos a string
+  let info = "Título;ISSN impresa;ISSN en linea;Instituto" + "\n";
+  for(let i = 0; i < registros.length; i++){
+    info += `${registros[i].titulo};${registros[i].issnImpreso};${registros[i].issnEnLinea};${registros[i].instituto}` + "\n";
+  }
+
+ const jsonFilePath = path.join(__dirname + '/../Revistas/Scielo.json');
+ const csvFilePath  = path.join(__dirname + '/../Revistas/Scielo.csv');
+
+  // Con todos los datos en string, escribo la info en formato csv y después uso el modulo csvtojson para crear el archivo .json
+  try
+  {
+    let vigilante = fs.watch(csvFilePath, function () { // // Se ejecutara cuando detecte un cambio en el archivo (en caso de que si exista el archivo .csv)
+      
+      csvtojson({delimiter: [";"],}).fromFile(csvFilePath).then((json) => // La propiedad delimiter indica porque caracter debe separar
+      { 
+        fs.writeFileSync(jsonFilePath, JSON.stringify(json), error => {if(error) console.log(error);})
+      })
+
+      vigilante.close();
+    });
+  }
+  catch(error)
+  {
+    let vigilante = chokidar.watch(csvFilePath); // Archivo que le indico que vigile
+
+    vigilante.on('add', function(path) { // Se ejecutara cuando detecte la creación del archivo (en caso de que no exista el archivo .csv)
+    
+      csvtojson({delimiter: [";"],}).fromFile(csvFilePath).then((json) =>
+      { 
+        fs.writeFileSync(jsonFilePath, JSON.stringify(json), error => {if(error) console.log(error);})
+      })
+  
+      vigilante.close();    // Dejo de vigilar
+    });
+  }
+
+  fs.writeFileSync(csvFilePath, info); // Escribo el archivo
 
  console.log("Termina la extracción de datos de Scielo");
 }

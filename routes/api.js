@@ -209,13 +209,17 @@ router.post('/actualizarCatalogo', function(req, res){
                 archivoDeExtraccion.extraerInfoWoS();
                 break;
 
+            case 'Scielo':
+                archivoDeExtraccion.extraerInfoScielo();
+                break;
+
             case 'Listado de revistas':
                 let archivoArmadoDeListado = require('../SGE_Arg/listadoRevistas.js');
                 archivoArmadoDeListado.crearListado();
                 break;
             
             default:
-                console.log('No existe tal archivo');
+                console.log('No existe tal revista');
         }
     }
     catch(error)

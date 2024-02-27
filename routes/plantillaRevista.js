@@ -197,7 +197,7 @@ function armarHTML(archivoJSON, tituloSitioWeb){
 
     pagina +=
         `
-            <p>Última actualización: ${fechaUltimaModicacion.getDate()}/${fechaUltimaModicacion.getMonth()}/${fechaUltimaModicacion.getFullYear()} (DD/MM/YY)</p>
+            <p>Última actualización: ${fechaUltimaModicacion.getDate()}/${fechaUltimaModicacion.getMonth()+1}/${fechaUltimaModicacion.getFullYear()} (DD/MM/YY)</p>
             <p><button id="actualizarCatalogo">Actualizar catálogo de revistas</button></p>
 
             <p><a href="/">Volver</a></p>
@@ -207,7 +207,8 @@ function armarHTML(archivoJSON, tituloSitioWeb){
 
         </body>
     </html>`
- 
+    // getMonth() devuelve un valor entre 0 y 11, siendo 0 el mes de Enero; por eso se le suma uno
+
     return pagina;
 }
 
