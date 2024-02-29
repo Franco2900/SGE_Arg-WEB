@@ -63,7 +63,7 @@ router.get('/', function(req, res, next) {
       <p>Los sitios web de los que extraemos información son: </p>
     `
 
-    let revistas = ['CAICYT', 'Latindex', 'DOAJ', 'Redalyc', 'Biblat', 'Scopus', 'Scielo', 'WoS', 'Dialnet'];
+    let revistas = ['CAICYT', 'Latindex', 'DOAJ', 'Redalyc', 'Biblat', 'Scimago', 'Scielo', 'WoS', 'Dialnet'];
 
     // LAS REVISTAS
     for(let i = 0; i < revistas.length; i++){
@@ -74,7 +74,7 @@ router.get('/', function(req, res, next) {
       `
       <div class="col-md-4 text-center">
         <a href="/revista/${revistas[i]}">
-          <img src="images/${revistas[i]}.jpg" class="mx-auto d-block">
+          <img src="images/${revistas[i]}.jpg" class="mx-auto d-block border border-dark">
           <br/>
           ${revistas[i]}
         </a>

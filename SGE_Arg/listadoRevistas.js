@@ -2,62 +2,41 @@ const fs = require('fs');        // Módulo para leer y escribir archivos
 const csvtojson = require('csvtojson')  // Módulo para pasar texto csv a json
 const path = require('path');             // Módulo para trabajar con paths
 
-var sitiosWeb = []; // Almaceno los archivo JSON acá
+var archivosJSON = []; // Almaceno los archivo JSON disponibles acá
 // Se puede llamar directamente a un archivo JSON local y este será automaticamente parseado para usar inmediatamente
 
-// Try-catch en caso de que no se encuentre un archivo
+// Me fijo que archivos json estan disponibles
+let auxSitiosWeb = ['CAICYT', 'DOAJ', 'Latindex', 'Redalyc', 'Scimago', 'Scielo', 'WoS'];
+
 var archivoCAICYTEncontrado = false;
-try {
-    const CAICYT = require('./Revistas/CAICYT.json');
-    sitiosWeb.push(CAICYT);
-    archivoCAICYTEncontrado = true;
-    console.log("Sitio web incluido en el listado: CAICYT");
-}
-catch (error) {
-    sitiosWeb.push([]);
-    console.log("Hay un problema con el archivo del sitio web CAICYT");
-    console.log(error);
-}
-
 var archivoDOAJEncontrado = false;
-try {
-    const DOAJ = require('./Revistas/DOAJ.json');
-    sitiosWeb.push(DOAJ);
-    archivoDOAJEncontrado = true;
-    console.log("Sitio web incluido en el listado: DOAJ");
-}
-catch (error) {
-    sitiosWeb.push([])
-    console.log("Hay un problema con el archivo del sitio web DOAJ");
-    console.log(error);
-}
-
 var archivoLatindexEncontrado = false;
-try {
-    const Latindex = require('./Revistas/Latindex.json');
-    sitiosWeb.push(Latindex);
-    archivoLatindexEncontrado = true;
-    console.log("Sitio web incluido en el listado: Latindex");
-}
-catch (error) {
-    sitiosWeb.push([])
-    console.log("Hay un problema con el archivo del sitio web Latindex");
-    console.log(error);
-}
-
 var archivoRedalycEncontrado = false;
-try {
-    const Redalyc = require('./Revistas/Redalyc.json');
-    sitiosWeb.push(Redalyc);
-    archivoRedalycEncontrado = true;
-    console.log("Sitio web incluido en el listado: Redalyc");
-}
-catch (error) {
-    sitiosWeb.push([])
-    console.log("Hay un problema con el archivo del sitio web Redalyc");
-    console.log(error);
-}
+var archivoScimagoEncontrado = false;
+var archivoScieloEncontrado = false;
+var archivoWoSEncontrado = false;
 
+for(let i = 0; i < auxSitiosWeb.length; i++)
+{
+    try {
+        archivosJSON.push(require(path.join(__dirname + `/Revistas/${auxSitiosWeb[i]}.json`)) );
+
+        if(auxSitiosWeb[i] == 'CAICYT')     archivoCAICYTEncontrado     = true;
+        if(auxSitiosWeb[i] == 'DOAJ')       archivoDOAJEncontrado       = true;
+        if(auxSitiosWeb[i] == 'Latindex')   archivoLatindexEncontrado   = true;
+        if(auxSitiosWeb[i] == 'Redalyc')    archivoRedalycEncontrado    = true;
+        if(auxSitiosWeb[i] == 'Scimago')    archivoScimagoEncontrado    = true;
+        if(auxSitiosWeb[i] == 'Scielo')     archivoScieloEncontrado     = true;
+        if(auxSitiosWeb[i] == 'WoS')        archivoWoSEncontrado        = true;
+
+        console.log(`Sitio web incluido en el listado: ${auxSitiosWeb[i]}`);
+    }
+    catch (error) {
+        archivosJSON.push([])
+        console.log(`Hay un problema con el archivo del sitio web ${auxSitiosWeb[i]}`);
+        console.log(error);
+    }
+}
 
 // Clase para pasar el texto de los archivos JSON a objetos y así poder hacer el ordenamiento
 class Revista {
@@ -89,20 +68,14 @@ function crearListado() {
         var cantidadErrores = 0; // Esta variable me sirve para saber cuantas revistas no aparecen en el listado debido a un error en la extracción de datos
 
         // Creo una lista inicial poniendo todas las revistas de todos los sitios web en un solo arreglo
-        for (var i = 0; i < sitiosWeb.length; i++) // for para recorrer todas los sitios web
+        for (var i = 0; i < archivosJSON.length; i++) // for para recorrer todos los sitios web
         {
-            var archivoJSON = sitiosWeb[i];
+            var archivoJSON = archivosJSON[i];
 
-            for (var j = 0; j < sitiosWeb[i].length; j++) // for para recorrer las revistas de cada sitio web
+            for (var j = 0; j < archivosJSON[i].length; j++) // for para recorrer las revistas de cada sitio web
             {
-                if (archivoJSON[j].Título == "HUBO UN ERROR") 
-                {
-                    cantidadErrores++;
-                }
-                else 
-                {
-                    revistas.push(new Revista(archivoJSON[j].Título, archivoJSON[j]['ISSN impresa'], archivoJSON[j]['ISSN en linea'], archivoJSON[j]['Instituto'])); // Paso el texto a objetos para poder hacer el ordenamiento por alfabeto
-                }
+                if (archivoJSON[j].Título == "HUBO UN ERROR") cantidadErrores++;
+                else                                          revistas.push(new Revista(archivoJSON[j].Título, archivoJSON[j]['ISSN impresa'], archivoJSON[j]['ISSN en linea'], archivoJSON[j]['Instituto'])); // Paso el texto a objetos para poder hacer el ordenamiento por alfabeto
             }
         }
 
@@ -161,13 +134,13 @@ function crearListado() {
         // Chequeo si la revista esta en un sitio web o no. ARREGLAR: Solo sirve si se cargan todos los archivos
         for(var r = 0; r < revistas.length; r++) // Eligo una revista de mi arreglo
         {
-            for(var i = 0; i < sitiosWeb.length; i++) // Eligo un sitio web
+            for(var i = 0; i < archivosJSON.length; i++) // Eligo un sitio web
             {
-                for(var j = 0; j < sitiosWeb[i].length; j++) // Recorro todas las revistas del sitio web
+                for(var j = 0; j < archivosJSON[i].length; j++) // Recorro todas las revistas del sitio web
                 {
-                    if(sitiosWeb[i][j]['ISSN en linea'] == revistas[r].issnEnLinea) // Si el ISSN electronico de la revista del arreglo y la revista del sitio coinciden, entonces la revista del arreglo se encuentra en dicho sitio web
+                    if(archivosJSON[i][j]['ISSN en linea'] == revistas[r].issnEnLinea) // Si el ISSN electronico de la revista del arreglo y la revista del sitio coinciden, entonces la revista del arreglo se encuentra en dicho sitio web
                     {
-                        //console.log(`r:${r} - i:${i} - j:${j} - ${sitiosWeb[i][j]['ISSN en linea']} - ${revistas[r].issnEnLinea}`); // DEBUGEO
+                        //console.log(`r:${r} - i:${i} - j:${j} - ${archivosJSON[i][j]['ISSN en linea']} - ${revistas[r].issnEnLinea}`); // DEBUGEO
 
                         if(i == 0) revistas[r].CAICYT   = true;
                         if(i == 1) revistas[r].DOAJ     = true;
@@ -223,6 +196,9 @@ function crearListado() {
         if(archivoDOAJEncontrado)     listado += ";DOAJ"
         if(archivoLatindexEncontrado) listado += ";Latindex"
         if(archivoRedalycEncontrado)  listado += ";Redalyc"
+        if(archivoScimagoEncontrado)  listado += ";Scimago"
+        if(archivoScieloEncontrado)   listado += ";Scielo"
+        if(archivoWoSEncontrado)      listado += ";WoS"
         
         listado += "\n";
 
@@ -265,6 +241,5 @@ function crearListado() {
     }
 
 }
-
 
 exports.crearListado = crearListado;

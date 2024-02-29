@@ -1,7 +1,16 @@
-Cuando extraemos los datos tenemos que usar los mismos nombres de variables en todos los archivos
-
+MEJORAR
 Fijarse como mejorar la velocidad de extracción de datos
 
+ACTUALIZAR
 Hay scripts que esperan un tiempo determinado para continuar la ejecución. Hay que actualizarlos con el módulo chokidar que sirve especificamente para ejecutar código cuando detecta cambios en un archivo
 
-Cuando se quiere extraer y se pasa de los 30 segundos de espera para conectarse, tambien se cae el sitio web
+ARREGLAR
+Cuando se quiere extraer y se pasa de los 30 segundos de espera para conectarse, tambien se cae el sitio web.
+
+Algunas veces cuando no existe el archivo de datos de la revista, no se reinicia la página para mostrar los nuevos datos
+
+Arreglar el path de los archivos de extracción
+
+Cambiar el modelo de actualizar datos para la revista CAICYT. En vez de volver a extraer los datos desde cero, fijarse si hay una nueva revista y añadirla al archivo de datos
+
+Identificar ISSN electronico del ISSN impreso de las revistas de Biblat

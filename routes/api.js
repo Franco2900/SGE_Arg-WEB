@@ -213,6 +213,10 @@ router.post('/actualizarCatalogo', function(req, res){
                 archivoDeExtraccion.extraerInfoScielo();
                 break;
 
+            case 'Scimago':
+                archivoDeExtraccion.extraerInfoScimagojr();
+                break;
+
             case 'Listado de revistas':
                 let archivoArmadoDeListado = require('../SGE_Arg/listadoRevistas.js');
                 archivoArmadoDeListado.crearListado();

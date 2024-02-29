@@ -81,15 +81,15 @@ router.get('/biblat', function(req, res, next) {
 
 
 
-router.get('/scopus', function(req, res, next) {
+router.get('/Scimago', function(req, res, next) {
 
     try{
-        const archivoJSON = require('../SGE_Arg/Revistas/Scopus.json');
-        let pagina = plantilla.armarHTML(archivoJSON, 'Scopus');
+        const archivoJSON = require('../SGE_Arg/Revistas/Scimago.json');
+        let pagina = plantilla.armarHTML(archivoJSON, 'Scimago');
         res.send(pagina);
     }
     catch(error){
-        let pagina = plantilla.armarHTMLvacio('Scopus');
+        let pagina = plantilla.armarHTMLvacio('Scimago');
         res.send(pagina);
     }
 });
