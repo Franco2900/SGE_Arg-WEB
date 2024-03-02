@@ -94,53 +94,14 @@ function armarHTML(archivoJSON, tituloSitioWeb){
         <body class='fondoClaro container-fluid'>
 
             <h1 style="text-align: center;">${tituloSitioWeb}</h1>
+            
     `
 
-    // Cambiar a algo más simple para ahorrar lineas <img src="images/${tituloSitioWeb}.jpg">
-    switch(tituloSitioWeb)
-    {
-        case 'CAICYT':
-            pagina += `<img src="images/caicyt.jpg" class="mx-auto d-block"/> <br/>`;
-            break;
-        
-        case 'Latindex':
-            pagina += `<img src="images/latindex.jpg" class="mx-auto d-block" /> <br/>`;
-            break;
+    // Foto de la revista
+    if(tituloSitioWeb != 'Listado de revistas') pagina += `<img src="images/${tituloSitioWeb}.jpg" class="mx-auto d-block border border-dark"/> <br/>`
+    else                                        pagina += `<img src="images/${tituloSitioWeb}.jpg" class="mx-auto d-block border border-dark" style="height: 10%; width: 20%;" /> <br/>`
 
-        case 'DOAJ':
-            pagina += `<img src="images/doaj.jpg" class="mx-auto d-block" /> <br/>`;
-            break;
-        
-        case 'Redalyc':
-            pagina += `<img src="images/redalyc.jpg" class="mx-auto d-block" /> <br/>`;
-            break;
-
-        case 'Biblat':
-            pagina += `<img src="images/biblat.jpg" class="mx-auto d-block" /> <br/>`;
-            break;
-
-        case 'Scopus':
-            pagina += `<img src="images/Scimago.jpg" class="mx-auto d-block" /> <br/>`;
-            break;
-
-        case 'Scielo':
-            pagina += `<img src="images/scielo.jpg" class="mx-auto d-block" /> <br/>`;
-            break;
-
-        case 'WoS':
-            pagina += `<img src="images/WoS.jpg" class="mx-auto d-block" /> <br/>`;
-            break;
-
-        case 'Dialnet':
-            pagina += `<img src="images/dialnet.jpg" class="mx-auto d-block" /> <br/>`;
-            break;
-
-        case 'Listado de revistas':
-            pagina += `<img src="images/listado.png" class="mx-auto d-block" style="height: 15vh;" />
-                        <br/>`;
-            break;
-    }
-
+    // Botones arriba de la tabla
     pagina += 
             `
             <div class="row">
@@ -169,11 +130,11 @@ function armarHTML(archivoJSON, tituloSitioWeb){
             <br/>
     `
 
-    /* Poner el texto de cambiar fondo a la izquierda y los de descarga a la derecha */
-
+    // Texto descriptivo
     if(tituloSitioWeb == 'Listado de revistas') pagina +=  `<p>Estas son todas las revistas argentinas que se pudieron encontrar en todos los sitios web</p>`
     else                                        pagina +=  `<p>Estas son las revistas argentinas que se encuentran en el sitio web ${tituloSitioWeb}</p>`
             
+    // Botones para manejar la tabla
     pagina += 
     `
         <p>Página <span id="paginaActual">1</span> de <span id="cantidaPaginas">${cantidaPaginas}</span></p>
@@ -187,14 +148,17 @@ function armarHTML(archivoJSON, tituloSitioWeb){
         <br><br/>
     `
 
+    // La tabla
     pagina += armarTablaDeRevistas(primeras20Revistas, 1);
 
+    // Información sobre la tabla
     if(tituloSitioWeb == 'Listado de revistas') pagina += `<p>Cantidad de revistas argentinas: ${cantidadRevistas}</p>`
     else                                        pagina += `<p>Cantidad de revistas en ${tituloSitioWeb}: ${cantidadRevistas}</p>`
 
     let estadisticasDelArchivo = fs.statSync(`./SGE_Arg/Revistas/${tituloSitioWeb}.json`);
     let fechaUltimaModicacion = estadisticasDelArchivo.mtime;
 
+    // Botón de actualizar tabla y botón de volver
     pagina +=
         `
             <p>Última actualización: ${fechaUltimaModicacion.getDate()}/${fechaUltimaModicacion.getMonth()+1}/${fechaUltimaModicacion.getFullYear()} (DD/MM/YY)</p>

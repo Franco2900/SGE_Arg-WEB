@@ -2,19 +2,26 @@ const fs         = require('fs');        // Módulo para leer y escribir archivo
 const puppeteer  = require('puppeteer'); // Módulo para web scrapping
 const jsdom      = require('jsdom');     // Módulo para filtrar la información extraida con web scrapping
 const csvtojson  = require('csvtojson'); // Módulo para pasar texto csv a json
+const path = require('path');            // Módulo para trabajar con rutas
 
 // El web scrapping de Redalyc es especial porque se hace todo en la misma URL, para ver el resto de las revistas se actualiza el sitio
 // Busco los enlaces de todas las revistas
 async function extraerInfoRedalyc()
 {
-    const browser  = await puppeteer.launch({headless: 'new'}); // Inicio puppeter
+    const browser  = await puppeteer.launch({headless: false}); // Inicio puppeter
    
     try
     {
         const page     = await browser.newPage();
-        page.setDefaultNavigationTimeout(120000);                     // Indico el tiempo limite para conectarse a un sitio web en milisegundos. Con cero quita el límite de tiempo (no es recomendable poner en 0 porque puede quedar en un bucle infinito en caso de error)
+        page.setDefaultNavigationTimeout(120000);                // Indico el tiempo limite para conectarse a un sitio web en milisegundos. Con cero quita el límite de tiempo (no es recomendable poner en 0 porque puede quedar en un bucle infinito en caso de error)
         await page.goto(`https://www.redalyc.org/pais.oa?id=9`); // URL del sitio web al que se le hace web scrapping
         await page.waitForSelector(".wrapper");                  // Espera a que el elemento indicado se cargue en el sitio web
+        
+        await page.click('#pageSize');                                       // Hago click en la opción de tamaño
+        await page.waitForSelector('#pageSize option');                      // Espero a que se cargue
+        await page.select('#pageSize', '50');                                // Selecciono que se muestre de 50 revistas a la vez
+        await page.waitForSelector("div.container-cards div:nth-child(50)"); // Espero a que se carguen las 50 revistas
+
         var html = await page.content();                         // Guardo el HTML extraido en esta variable  
         
         var { window: { document } } = new jsdom.JSDOM(html);    // Inicio JSDOM y le paso el HTML extraido
@@ -23,7 +30,7 @@ async function extraerInfoRedalyc()
         const cantidadRevistas = parseInt(document.getElementsByClassName("elemento-filtro")[0].getElementsByClassName("ng-binding")[1].textContent.trim().replaceAll("(", "").replaceAll(")", "") );
         console.log("Cantidad de revistas: " + cantidadRevistas);
 
-        var cantidadPaginas = Math.ceil(cantidadRevistas / 15);
+        var cantidadPaginas = Math.ceil(cantidadRevistas / 50);
         console.log("Cantidad de páginas: " + cantidadPaginas);
 
 
@@ -31,7 +38,7 @@ async function extraerInfoRedalyc()
         var info = "Título;ISSN impresa;ISSN en linea;Instituto" + "\n";           // Info que quiero extraer
         for(var paginaActual = 1; paginaActual <= cantidadPaginas; paginaActual++) // Para recorrer todas las páginas
         {
-            console.log(`Página actual: ${paginaActual}`);
+            console.log(`PÁGINA ACTUAL: ${paginaActual}`);
 
             if(paginaActual > 1) // Si la página no es la primera, me muevo a la siguiente
             {
@@ -48,8 +55,8 @@ async function extraerInfoRedalyc()
             {
                 var titulo = revistas[i].querySelectorAll("h4 a")[0].textContent;
 
-                var issnImpresa = null;
-                var issnEnLinea = null;
+                var issnImpresa = "";
+                var issnEnLinea = "";
                 if(revistas[i].querySelectorAll("span")[1] == undefined)
                 {
                     issnEnLinea = revistas[i].querySelectorAll("span")[0].textContent.trim().replaceAll("ISSN: ", "");
@@ -76,8 +83,11 @@ async function extraerInfoRedalyc()
         }
 
 
+        const csvFilePath  = path.join(__dirname + '/../Revistas/Redalyc.csv')
+        const jsonFilePath = path.join(__dirname + '/../Revistas/Redalyc.json');
+
         // Escribo la info en formato CSV. En caso de que ya exista el archivo, lo reescribe así tenemos siempre la información actualizada
-        fs.writeFile('./Revistas/Redalyc.csv', info, error => 
+        fs.writeFile(csvFilePath, info, error => 
         { 
             if(error) console.log(error);
         })
@@ -86,9 +96,9 @@ async function extraerInfoRedalyc()
         setTimeout(function () { // Le indico al programa que espere 5 segundos antes de seguir porque tarda en crearse el archivo .csv
 
             // Parseo de CSV a JSON
-            csvtojson({delimiter: [";"],}).fromFile('./Revistas/Redalyc.csv').then((json) => // La propiedad delimiter indica porque caracter debe separar
+            csvtojson({delimiter: [";"],}).fromFile(csvFilePath).then((json) => // La propiedad delimiter indica porque caracter debe separar
             { 
-                fs.writeFile('./Revistas/Redalyc.json', JSON.stringify(json), error => 
+                fs.writeFile(jsonFilePath, JSON.stringify(json), error => 
                 { 
                     if(error) console.log(error);
                 })

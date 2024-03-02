@@ -92,7 +92,7 @@ router.get('/', function(req, res, next) {
       
     <div class="text-center">
       <a href="/revista/listadoRevistas/">
-        <img src="images/listado.png" class="mx-auto d-block" style="height: 10%; width: 20%;">
+        <img src="images/Listado de revistas.jpg" class="mx-auto d-block border border-dark" style="height: 10%; width: 20%;">
         <br/>
         Listado de revistas
       </a>
