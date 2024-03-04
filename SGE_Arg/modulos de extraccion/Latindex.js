@@ -3,6 +3,7 @@ const puppeteer = require('puppeteer'); // Módulo para web scrapping
 const jsdom     = require('jsdom');     // Módulo para filtrar la información extraida con web scrapping
 const csvtojson = require('csvtojson')  // Módulo para pasar texto csv a json
 const path      = require('path');      // Módulo para trabajar con los path/rutas (Es un modelo núcleo de Node.js)
+const chokidar = require('chokidar');   // Módulo para detectar cambios en un archivo o la creación del mismo
 
 // Busco cuantas páginas devuelve la consulta a Latindex (cada página tiene entre 1 y 20 revistas)
 async function buscarCantidadPaginas() {
@@ -194,7 +195,6 @@ exports.extraerInfoLatindex = extraerInfoLatindex;
 // Se utiliza la función de descargar documentos de Latindex, esto es lo más cercano a una API que tiene el sitio web.
 async function extraerInfoLatindexLite() {
 
-  console.log("Iniciado extracción de datos de Latindex");
   const browser = await puppeteer.launch({ headless: 'new' }); // inicio puppeter
 
   try {
@@ -205,9 +205,10 @@ async function extraerInfoLatindexLite() {
     await page._client().send('Page.setDownloadBehavior',
     {
       behavior: 'allow',                        // Permito la descarga de archivos
-      downloadPath: path.resolve('./Revistas'), // Indico donde quiero descargar el archivo. La función resolve() transforma path relativos en path absolutos
+      downloadPath: path.join(__dirname + '/../Revistas'), // Indico donde quiero descargar el archivo. La función resolve() transforma path relativos en path absolutos
     });
 
+    await page.waitForSelector('a.export-links[data-href*="https://www.latindex.org/latindex/exportar/busquedaAvanzada/json"]'); // Espero a que se cargue el elemento
     await page.click('a.export-links[data-href*="https://www.latindex.org/latindex/exportar/busquedaAvanzada/json"]'); // Indico donde hacer click
 
     console.log("Solicitando datos a Latindex");
@@ -215,19 +216,35 @@ async function extraerInfoLatindexLite() {
       if (e.state === 'completed') console.log("Solicitud completa. Procesando información"); // Le indico que si el estado de la descarga es completado, que muestre el mensaje
     });
 
+    const archivoDescargadoPath = path.join(__dirname + '/../Revistas/Busqueda_avanzada.json');
+    let vigilante = chokidar.watch(archivoDescargadoPath); // Archivo que le indico que vigile
 
-    setTimeout(function () { // Le indico al programa que espere 10 segundos antes de seguir porque cuando se descarga algo primero se crea un archivo temporal y luego obtenemos el archivo descargado. Solo con la confirmación de descarga completada de parte del navegador no alcanza
-      try {
-        const archivoDescargado = require(path.resolve('./Revistas/Busqueda_avanzada.json'));
-
+    vigilante.on('add', function() { // Se ejecutara cuando detecte la creación del archivo (en caso de que no exista el archivo .csv)
+    
+      try 
+      {
+        const archivoDescargado = require(archivoDescargadoPath)
 
         var info = "Título;ISSN en linea;ISSN impresa;ISSN-L;Instituto" + "\n";
         for (var i = 0; i < archivoDescargado.length; i++) {
-          info += `${archivoDescargado[i].tit_propio};${archivoDescargado[i].issn_e};${archivoDescargado[i].issn_imp};${archivoDescargado[i].issn_l};${archivoDescargado[i].nombre_edi.replaceAll(";", ",")}` + `\n`;
+
+          let issnElectronico = "";
+          if(archivoDescargado[i].issn_e != null) issnElectronico = archivoDescargado[i].issn_e;
+
+          let issnImpreso = "";
+          if(archivoDescargado[i].issn_imp != null) issnImpreso = archivoDescargado[i].issn_imp;
+
+          let editorial = "";
+          if(archivoDescargado[i].nombre_edi != null) editorial = archivoDescargado[i].nombre_edi.replaceAll(";", ",");
+
+          info += `${archivoDescargado[i].tit_propio};${issnElectronico};${issnImpreso};${archivoDescargado[i].issn_l};${editorial}` + `\n`;
         }
 
+        const csvFilePath  = path.join(__dirname + '/../Revistas/Latindex.csv');
+        const jsonFilePath = path.join(__dirname + '/../Revistas/Latindex.json');
+
         // Escribo la info en formato csv. En caso de que ya exista el archivo, lo reescribe así tenemos siempre la información actualizada
-        fs.writeFile('./Revistas/Latindex.csv', info, error => {
+        fs.writeFile(csvFilePath, info, error => {
           if (error) console.log(error);
         })
 
@@ -235,20 +252,19 @@ async function extraerInfoLatindexLite() {
         setTimeout(function () {
 
           // Parseo de CSV a JSON
-          csvtojson({ delimiter: [";"], }).fromFile('./Revistas/Latindex.csv').then((json) => // La propiedad delimiter indica porque caracter debe separar
+          csvtojson({ delimiter: [";"], }).fromFile(csvFilePath).then((json) => // La propiedad delimiter indica porque caracter debe separar
           {
-            fs.writeFile('./Revistas/Latindex.json', JSON.stringify(json), error => {
+            fs.writeFile(jsonFilePath, JSON.stringify(json), error => {
               if (error) console.log(error);
             })
           })
 
+          // Elimino el archivo que descargue de Latindex
+          fs.unlink(archivoDescargadoPath, (error) => {
+            if (error) return console.log(error);
+          });
+
         }, 5000);
-
-
-        // Elimino el archivo que descargue de Latindex
-        fs.unlink(path.resolve('./Revistas/Busqueda_avanzada.json'), (error) => {
-          if (error) return console.log(error);
-        });
 
         console.log("Termina la extracción de datos de Latindex");
       }
@@ -257,9 +273,11 @@ async function extraerInfoLatindexLite() {
         console.log("HUBO UN ERROR CON EL ARCHIVO DESCARGADO");
         console.error(error);
         console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-      }
 
-    }, 10000);
+      }
+  
+      vigilante.close();    // Dejo de vigilar
+    });
 
   }
   catch (error) {

@@ -240,6 +240,10 @@ router.post('/actualizarCatalogo', function(req, res){
 
             console.log("Extracción de datos completa");
             res.send();
+
+            // Otra forma de hacerlo
+            //if(req.body.tituloSitioWeb == 'Listado de revistas') res.redirect(`/revista/listadoRevistas`);
+            //else                                                 res.redirect(`/revista/${req.body.tituloSitioWeb}`);
         });
     }
     catch(error) // Si el archivo JSON no existe y hay que extraer los datos de cero, se ejecuta esto
@@ -252,6 +256,9 @@ router.post('/actualizarCatalogo', function(req, res){
 
             console.log("Extracción de datos completa");
             res.send();
+
+            //if(req.body.tituloSitioWeb == 'Listado de revistas') res.redirect(`/revista/listadoRevistas`);
+            //else                                                 res.redirect(`/revista/${req.body.tituloSitioWeb}`);
         });
     }
 

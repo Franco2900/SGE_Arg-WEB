@@ -56,21 +56,21 @@ function filtro(info, limite, revista, respuestaJSON)
 
         // No todas las revistas tienen todos los datos, así que tengo que verificar si tienen ciertos datos o no
         var eissn; // E-ISSN significa ISSN en linea
-        if(typeof(respuestaJSON.results[i].bibjson.eissn) == "undefined") eissn = null;
+        if(typeof(respuestaJSON.results[i].bibjson.eissn) == "undefined") eissn = "";
         else                                                              eissn = respuestaJSON.results[i].bibjson.eissn.trim().replaceAll(";", ",");
 
         var pissn; // P-ISSN significa ISSN impresa
-        if(typeof(respuestaJSON.results[i].bibjson.pissn) == "undefined") pissn = null;
+        if(typeof(respuestaJSON.results[i].bibjson.pissn) == "undefined") pissn = "";
         else                                                              pissn = respuestaJSON.results[i].bibjson.pissn.trim().replaceAll(";", ",");
 
         var nombreInstituto;
-        if     (typeof(respuestaJSON.results[i].bibjson.institution)      == "undefined") nombreInstituto = null;
-        else if(typeof(respuestaJSON.results[i].bibjson.institution.name) == "undefined") nombreInstituto = null;
+        if     (typeof(respuestaJSON.results[i].bibjson.institution)      == "undefined") nombreInstituto = "";
+        else if(typeof(respuestaJSON.results[i].bibjson.institution.name) == "undefined") nombreInstituto = "";
         else nombreInstituto = respuestaJSON.results[i].bibjson.institution.name.trim().replaceAll(";", ",");
 
         var editora;
-        if     (typeof(respuestaJSON.results[i].bibjson.publisher)      == "undefined") editora = null;
-        else if(typeof(respuestaJSON.results[i].bibjson.publisher.name) == "undefined") editora = null;
+        if     (typeof(respuestaJSON.results[i].bibjson.publisher)      == "undefined") editora = "";
+        else if(typeof(respuestaJSON.results[i].bibjson.publisher.name) == "undefined") editora = "";
         else                                                                            editora = respuestaJSON.results[i].bibjson.publisher.name.trim().replaceAll(";", ",");
 
         info += `${titulo};${pissn};${eissn};${nombreInstituto};${editora}\n`;
