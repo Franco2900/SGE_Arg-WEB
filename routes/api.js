@@ -190,7 +190,7 @@ router.post('/actualizarCatalogo', function(req, res){
     
         switch(req.body.tituloSitioWeb){
             case 'CAICYT':
-                archivoDeExtraccion.extraerInfoCAICYT();
+                archivoDeExtraccion.actualizarDatos();
                 break;
             
             case 'Redalyc':
@@ -225,43 +225,68 @@ router.post('/actualizarCatalogo', function(req, res){
             default:
                 console.log('No existe tal revista');
         }
+        
+
+
+        if(fs.existsSync(path.join(__dirname, `../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`)) ) // Si el archivo JSON ya existe y solo se actualiza, se ejecuta esto
+        { 
+            let vigilante = fs.watch(path.join(__dirname, `../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`), function (tipoDeEvento, nombreArchivo){ // Cuando detecta una modificación en el archivo, se ejecuta la función
+                
+                vigilante.close();
+                clearTimeout(timeOut);
+    
+                console.log("Extracción de datos completa");
+                res.send("Actualización exitosa");
+    
+                // Otra forma de hacerlo
+                //if(req.body.tituloSitioWeb == 'Listado de revistas') res.redirect(`/revista/listadoRevistas`);
+                //else                                                 res.redirect(`/revista/${req.body.tituloSitioWeb}`);
+            });
+
+            let timeOut = setTimeout(function () { // Si después de 2 minutos todavía no se detecto la creación o modificación de los archivos, se considera que fallo la extracción
+                vigilante.close();
+                res.send("Actualización fallida");   
+            }, 120000);
+
+        }
+        else // Si el archivo JSON no existe y hay que extraer los datos de cero, se ejecuta esto
+        {
+            let vigilante = chokidar.watch(path.join(__dirname, `../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`) ); // Archivo que le indico que vigile
+    
+            vigilante.on('add', function(path) { // Cuando detecta la creación del archivo indicado, se ejecuta la función
+                
+                vigilante.close();
+                clearTimeout(timeOut);
+    
+                console.log("Extracción de datos completa");
+                res.send("Actualización exitosa");
+    
+                //if(req.body.tituloSitioWeb == 'Listado de revistas') res.redirect(`/revista/listadoRevistas`);
+                //else                                                 res.redirect(`/revista/${req.body.tituloSitioWeb}`);
+            });
+            
+            let timeOut = setTimeout(function () { 
+                vigilante.close();
+                res.send("Actualización fallida");   
+            }, 120000);
+        }
+
+        
+        /*setTimeout(function () { // Si después de 2 minutos todavía no se detecto la creación o modificación de los archivos, se considera que fallo la extracción
+            res.send("Actualización fallida");   
+        }, 120000);*/
+        // El error de la extracción se maneja así porque los módulos de extracción solo devuelven un console.log() cuando ocurre un error. 
+        // Quitar los catch() que tienen los módulos de extracción haría que el programa dejara de funcionar en caso de un error
+        // NO ANDA
+        // Si hay una actualización exitosa, el servidor envía tambien esta respuesta despues de 2 minutos y se rompe todo. 
+        // Esto es porque a cada solicitud al servidor, solo puede haber una respuesta
+
     }
     catch(error)
     {
         console.log(error);
+        res.send("Actualización fallida");
     }
-
-    
-    try// Si el archivo JSON ya existe y solo se actualiza, se ejecuta esto
-    { 
-        let vigilante = fs.watch(path.join(__dirname, `../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`), function (tipoDeEvento, nombreArchivo){ // Cuando detecta una modificación en el archivo, se ejecuta la función
-            
-            vigilante.close();
-
-            console.log("Extracción de datos completa");
-            res.send();
-
-            // Otra forma de hacerlo
-            //if(req.body.tituloSitioWeb == 'Listado de revistas') res.redirect(`/revista/listadoRevistas`);
-            //else                                                 res.redirect(`/revista/${req.body.tituloSitioWeb}`);
-        });
-    }
-    catch(error) // Si el archivo JSON no existe y hay que extraer los datos de cero, se ejecuta esto
-    {
-        let vigilante = chokidar.watch(path.join(__dirname, `../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`) ); // Archivo que le indico que vigile
-
-        vigilante.on('add', function(path) { // Cuando detecta la creación del archivo indicado, se ejecuta la función
-            
-            vigilante.close();
-
-            console.log("Extracción de datos completa");
-            res.send();
-
-            //if(req.body.tituloSitioWeb == 'Listado de revistas') res.redirect(`/revista/listadoRevistas`);
-            //else                                                 res.redirect(`/revista/${req.body.tituloSitioWeb}`);
-        });
-    }
-
 
 });
 

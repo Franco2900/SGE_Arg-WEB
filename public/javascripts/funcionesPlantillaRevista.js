@@ -176,20 +176,42 @@ document.getElementById("botonUltimaPagina").addEventListener("click", function(
 
 document.getElementById("actualizarCatalogo").addEventListener("click", function(){
 
+    // Muestro el gif de reloj
+    let estadoDeLaActualización = document.getElementById('estadoDeLaActualización');
+    estadoDeLaActualización.innerHTML = `<img src="../images/esperando.gif" class="mx-auto d-block border border-dark" />
+                                         <h2 style="text-align: center;">Actualizando datos. Espere por favor</h2>`;
+
+    document.getElementById("actualizarCatalogo").style.display="none"; // Hago invisible el boton de actualizar
+
     let tituloSitioWeb = document.getElementById("titulo").innerText;
 
+    // Creo y cofiguro el objeto para enviar y recibir solicitudes al servidor
     const xhttp = new XMLHttpRequest();    
     xhttp.open("POST", "http://localhost:3000/api/actualizarCatalogo", true); 
     xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     
+    // Le indico que hacer cuando reciba los datos del servidor
     xhttp.onreadystatechange = function() 
     {         
         if (this.readyState == 4 && this.status == 200)
         {
-            location.reload();
+            console.log(this.response);
+
+            if(this.response == "Actualización exitosa") location.reload();
+            else
+            {                                
+                estadoDeLaActualización.innerHTML = 
+                `<h4 style="text-align: center;">   
+                    Hubo un error al actualizar los datos. Esto puede deberse a un problema con su conexión a internet 
+                    o a que el sitio web de donde se extrae la información no esta disponible. Intentelo de nuevo más tarde.
+                </h4>`;
+
+                document.getElementById("actualizarCatalogo").style.display="none"; // Hago visible de vuelta el boton de actualizar
+            }
         }
     };
 
+    // Envio la solicitud al servidor
     let body = JSON.stringify({tituloSitioWeb: tituloSitioWeb});
     xhttp.send(body);
 })

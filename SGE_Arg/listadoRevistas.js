@@ -80,20 +80,20 @@ function crearListado() {
         }
 
 
-        // Ordeno alfabeticamente las revistas según el título. NOTA: Es ordenamiento por burbujeo, es el ordenamiento más simple de todos pero también el más lento. Cambiarlo por uno más rápido después
-        for (var i = 1; i < revistas.length; i++) 
-        {
-            for (var j = 0; j < revistas.length - 1; j++) 
-            {
-                if (revistas[j].titulo.toLowerCase() > revistas[j + 1].titulo.toLowerCase()) 
-                {
-                    var auxRevista  = new Revista();
-                    auxRevista      = revistas[j];
-                    revistas[j]     = revistas[j + 1];
-                    revistas[j + 1] = auxRevista;
-                }
-            }
-        }
+        // Ordeno alfabeticamente las revistas según el título.
+        revistas.sort(function(A, B){ 
+
+            let comparacion = 0; 
+            // Si da 0, son iguales
+            // Si da -1, A va antes de B 
+            // Si da 1, B va antes de A
+    
+            if(A.titulo < B.titulo) comparacion = -1;
+            if(A.titulo > B.titulo) comparacion = 1;
+    
+            return comparacion;
+        });
+
 
         console.log("***********************************************************");
         console.log("Cantidad de revistas a filtrar: " + revistas.length);

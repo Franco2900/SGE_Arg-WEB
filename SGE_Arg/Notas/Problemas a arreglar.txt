@@ -2,13 +2,7 @@ MEJORAR
 Fijarse como mejorar la velocidad de extracción de datos
 
 ACTUALIZAR
-Hay scripts que esperan un tiempo determinado para continuar la ejecución. Hay que actualizarlos con el módulo chokidar que sirve especificamente para ejecutar código cuando detecta cambios en un archivo
+Hay scripts que esperan un tiempo determinado para continuar la ejecución. Hay que actualizarlos con el módulo chokidar que sirve especificamente para ejecutar código cuando detecta cambios en un archivo o usar writeFyleSync()
 
 ARREGLAR
-Cuando se quiere extraer y se pasa de los 30 segundos de espera para conectarse, tambien se cae el sitio web.
-
-Arreglar el path de los archivos de extracción
-
-Cambiar el modelo de actualizar datos para la revista CAICYT. En vez de volver a extraer los datos desde cero, fijarse si hay una nueva revista y añadirla al archivo de datos
-
 Identificar ISSN electronico del ISSN impreso de las revistas de Biblat y Dialnet

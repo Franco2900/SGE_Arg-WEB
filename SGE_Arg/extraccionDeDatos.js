@@ -11,7 +11,7 @@ const Biblat   = require('./modulos de extraccion/Biblat.js');
 const Redalyc  = require('./modulos de extraccion/Redalyc.js');
 const Scielo  = require('./modulos de extraccion/Scielo.js');
 const WoS  = require('./modulos de extraccion/WoS.js');
-const Scimagojr  = require('./modulos de extraccion/Scimagojr.js');
+const Scimagojr  = require('./modulos de extraccion/Scimago.js');
 
 // APIs (los brindan los sitios web)
 //const DOAJ = require('./APIs/DOAJ API.js');
@@ -20,6 +20,7 @@ const Scimagojr  = require('./modulos de extraccion/Scimagojr.js');
 // Extracción de datos
 //CAICYT.extraerInfoCAICYT();
 //CAICYT.sanarDatos();
+CAICYT.actualizarDatos();
 //Redalyc.extraerInfoRedalyc();
 //Latindex.extraerInfoLatindex();
 //Latindex.extraerInfoLatindexLite();
@@ -27,4 +28,4 @@ const Scimagojr  = require('./modulos de extraccion/Scimagojr.js');
 //Biblat.extraerInfoBiblat();
 //Scielo.extraerInfoScielo();
 //WoS.extraerInfoWoS();
-Scimagojr.extraerInfoScimagojr();
+//Scimagojr.extraerInfoScimagojr();

@@ -2,7 +2,11 @@ const fs        = require('fs');        // Módulo para leer y escribir archivos
 const puppeteer = require('puppeteer'); // Módulo para web scrapping
 const jsdom     = require('jsdom');     // Módulo para filtrar la información extraida con web scrapping
 const csvtojson = require('csvtojson'); // Módulo para pasar texto csv a json
+const path = require('path');           // Módulo para trabajar con rutas
 
+
+const csvFilePath  = path.join(__dirname + '/../Revistas/CAICYT.csv');
+const jsonFilePath = path.join(__dirname + '/../Revistas/CAICYT.json');
 
 // Busco los enlaces de todas las revistas
 async function buscarEnlacesARevistas(tiempo) 
@@ -70,9 +74,9 @@ async function extraerInfoRevista(enlace, tiempo)
     {
       const titulo = document.getElementsByClassName("entry-title")[0].textContent.trim().replaceAll(";", ",");
 
-      var issnImpresa = null;
-      var issnEnLinea = null;
-      var auxISSN = null; // CASO EXCEPCIONAL: Una revista tiene tres ISSN, siendo el tercer ISSN la revista en ingles
+      var issnImpresa = "";
+      var issnEnLinea = "";
+      var auxISSN = ""; // CASO EXCEPCIONAL: Una revista tiene tres ISSN, siendo el tercer ISSN la revista en ingles
       // Algunas revistas solo tienen ISSN en linea, mientras que otras tienen ISSN en linea e impresa
 
       // Me fijo si la sección con la información tiene etiquetas <p> y <strong>
@@ -118,7 +122,7 @@ async function extraerInfoRevista(enlace, tiempo)
         // Algunas revistas tienen las etiquetas para el ISSN en linea pero no tienen nada de texto dentro
         if (issnEnLinea == "") 
         {
-          issnImpresa = null;
+          issnImpresa = "";
           issnEnLinea = etiquetasPyStrong[0].textContent.trim().replaceAll(";", ",").replaceAll("ISSN ", "").replaceAll("(En línea)", "");
         }
 
@@ -127,7 +131,7 @@ async function extraerInfoRevista(enlace, tiempo)
       }
       
 
-      var area = null;
+      var area = "";
       // Para chequear a que área corresponde cada revista reviso que imagen tienen en la clase "so-widget-image"
       const imagen = document.getElementsByClassName("so-widget-image")[0].getAttribute("src");
       switch (imagen) 
@@ -166,7 +170,7 @@ async function extraerInfoRevista(enlace, tiempo)
       }
 
       if (instituto.includes("English ed."))     instituto = instituto.replaceAll("English ed.", ""); // Hay una revista que tiene un tercer ISSN de la versión en ingles. Esta no se cuenta porque no es Argentina
-      if (auxISSN != null)                       instituto = instituto.replaceAll(`${auxISSN}`, "");  // Hay una revista que tiene un tercer ISSN de la versión en ingles. Esta no se cuenta porque no es Argentina
+      if (auxISSN != "")                       instituto = instituto.replaceAll(`${auxISSN}`, "");  // Hay una revista que tiene un tercer ISSN de la versión en ingles. Esta no se cuenta porque no es Argentina
       if (instituto.includes(";"))               instituto = instituto.replaceAll(";", ",");
       if (instituto.includes("."))               instituto = instituto.replaceAll(".", "");
       if (instituto.includes("("))               instituto = instituto.replaceAll("(", "");
@@ -192,7 +196,7 @@ async function extraerInfoRevista(enlace, tiempo)
         if (instituto[i] != " ") instituoVacio = false;
       }
 
-      if (instituoVacio) instituto = null;
+      if (instituoVacio) instituto = "";
 
       // Muestro en consola el resultado
       console.log(`***********************************************************************************`);
@@ -282,13 +286,13 @@ async function sanarDatos()
 
   // Busco los archivos para sanear
   var archivoCSV;
-  fs.readFile(`./Revistas/CAICYT.csv`, (error, datos) => 
+  fs.readFile(csvFilePath, (error, datos) => 
   {
     if (error) console.log(error);
     else archivoCSV = datos.toString();
   })
 
-  const archivoJSON = require(`../Revistas/CAICYT.json`);
+  const archivoJSON = require(jsonFilePath);
   const enlaces = await buscarEnlacesARevistas(0);
 
   var cantidadRevistarASanear = 0;
@@ -347,27 +351,156 @@ async function sanarDatos()
 }
 
 
+// Ya que el sitio de CAYCET se cae constantemente, la mejor forma de actualizar los datos es fijarse si en el sitio hay una revista que no este en el archivo JSON y añadirla
+class Revista {
+    
+  constructor(tituloRevista, issnImpreso, issnEnLinea, area, instituto) 
+  {
+    this.tituloRevista = tituloRevista;
+    this.issnImpreso   = issnImpreso;
+    this.issnEnLinea   = issnEnLinea;
+    this.area          = area;
+    this.instituto     = instituto;
+  }
+
+  toString() {
+    console.log(`Título: ${this.tituloRevista}, ISSN impreso: ${this.issnImpreso}, ISSN en linea: ${this.issnEnLinea}, Área: ${this.area}, Instituto: ${this.instituto}`);
+  }
+}
+
+async function actualizarDatos()
+{
+  let enlaces = await buscarEnlacesARevistas(120000); // Tiene los datos sin filtro
+  let auxEnlaces = enlaces.map((x) => x); 
+
+  let archivoJSON = require(jsonFilePath);
+  let revistas = []; // Tiene los datos sin filtro
+  let auxRevistas = []; 
+
+  // Paso la info del archivo JSON a objetos
+  for (let i = 0; i < archivoJSON.length; i++)
+  {
+    if (archivoJSON[i].Título == "HUBO UN ERROR")
+    {
+      revistas.push(new Revista("HUBO UN ERROR") );
+      auxRevistas.push(new Revista("HUBO UN ERROR") );
+    }
+    else
+    {
+      revistas.push(new Revista(archivoJSON[i].Título, archivoJSON[i]['ISSN impresa'], archivoJSON[i]['ISSN en linea'], archivoJSON[i]['Área'], archivoJSON[i]['Instituto']));
+      auxRevistas.push(new Revista(archivoJSON[i].Título, archivoJSON[i]['ISSN impresa'], archivoJSON[i]['ISSN en linea'], archivoJSON[i]['Área'], archivoJSON[i]['Instituto']));
+    }
+  }
+  
+
+  // Filtro los titulos de las revistas
+  for(let i = 0; i < auxRevistas.length; i++)
+  {
+    if (auxRevistas[i].tituloRevista.includes("("))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("(", "");
+    if (auxRevistas[i].tituloRevista.includes(")"))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll(")", "");
+    if (auxRevistas[i].tituloRevista.includes("."))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll(".", "");
+    if (auxRevistas[i].tituloRevista.includes("& ")) auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("& ", "");
+    if (auxRevistas[i].tituloRevista.includes("&"))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("&", "");
+    if (auxRevistas[i].tituloRevista.includes(","))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll(",", "");
+    if (auxRevistas[i].tituloRevista.includes("-"))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("-", " ");
+    if (auxRevistas[i].tituloRevista.includes("- ")) auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("- ", "");
+    if (auxRevistas[i].tituloRevista.includes("– ")) auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("– ", ""); // Signo menos, en vez de guion medio
+    if (auxRevistas[i].tituloRevista.includes("+"))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("+", "");
+    if (auxRevistas[i].tituloRevista.includes("@"))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("@", "");
+
+    auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.toLowerCase();
+
+    if (auxRevistas[i].tituloRevista.includes("á"))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("á", "a");
+    if (auxRevistas[i].tituloRevista.includes("é"))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("é", "e");
+    if (auxRevistas[i].tituloRevista.includes("í"))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("í", "i");
+    if (auxRevistas[i].tituloRevista.includes("ó"))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("ó", "o");
+    if (auxRevistas[i].tituloRevista.includes("ú"))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("ú", "u");
+    if (auxRevistas[i].tituloRevista.includes("ü"))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("ü", "u");
+    if (auxRevistas[i].tituloRevista.includes("ñ"))  auxRevistas[i].tituloRevista = auxRevistas[i].tituloRevista.replaceAll("ñ", "n");
+  }
+
+  // Filtro los enlaces
+  for(let i = 0; i < auxEnlaces.length; i++)
+  {
+    if (auxEnlaces[i].includes("http://www.caicyt-conicet.gov.ar/sitio/"))  auxEnlaces[i] = auxEnlaces[i].replaceAll("http://www.caicyt-conicet.gov.ar/sitio/", "");
+    if (auxEnlaces[i].includes("-"))  auxEnlaces[i] = auxEnlaces[i].replaceAll("-", " ");
+    if (auxEnlaces[i].includes("/"))  auxEnlaces[i] = auxEnlaces[i].replaceAll("/", "");
+    auxEnlaces[i] = auxEnlaces[i].toLowerCase();
+  }
+
+
+
+  for(let i = 0; i < enlaces.length; i++)
+  {
+    // Hago la comparación de los titulos de las revistas con los enlaces, y si dan diferentes es porque se añadio una nueva revista
+    if((!auxEnlaces[i].includes(auxRevistas[i].tituloRevista)) ){
+           
+      // Extraigo la info de la nueva revista
+      console.log("Encontrada nueva revista: ");
+      let infoRevistaNueva = await extraerInfoRevista(enlaces[i], 120000);
+      
+      // Convierto el string de información en objeto
+      infoRevistaNueva = infoRevistaNueva.split(";");
+      revistas.push(new Revista(infoRevistaNueva[0], infoRevistaNueva[1], infoRevistaNueva[2], infoRevistaNueva[3], infoRevistaNueva[4].replaceAll("\n", "")) );
+
+      // Ordeno alfabeticamente todas las revistas según su título
+      revistas.sort(function(A, B){ 
+
+        let comparacion = 0; 
+        // Si da 0, son iguales
+        // Si da -1, A va antes de B 
+        // Si da 1, B va antes de A
+
+        if(A.tituloRevista < B.tituloRevista) comparacion = -1;
+        if(A.tituloRevista > B.tituloRevista) comparacion = 1;
+
+        return comparacion;
+      });
+
+
+      // Convierto todos los objetos en string para poder escribir el archivo CSV
+      let revistasOrdenadas = "Título;ISSN impresa;ISSN en linea;Área;Instituto" + "\n";
+      for(let x = 0; x < revistas.length; x++)
+      {
+        revistasOrdenadas += `${revistas[x].tituloRevista};${revistas[x].issnImpreso};${revistas[x].issnEnLinea};${revistas[x].area};${revistas[x].instituto}\n`;
+      }
+
+
+      // Escribo el archivo
+      escribirArchivos(revistasOrdenadas);
+    
+
+      // A partir de acá, todas las revistas no coincidiran con sus enlaces. Por lo que al actualizar una sola revista se termina la actualización
+      i = enlaces.length;
+      console.log("Actualización terminada");
+    }
+
+  }
+
+}
+
+
+
 function escribirArchivos(info)
 {
   // Escribo la info en formato CSV. En caso de que ya exista el archivo, lo reescribe así tenemos siempre la información actualizada
-  fs.writeFile('./Revistas/CAICYT.csv', info, error => {
+  fs.writeFileSync(csvFilePath, info, error => {
     if (error) console.log(error);
   })
 
 
-  setTimeout(function () { // Le indico al programa que espere 5 segundos antes de seguir porque tarda en crearse el archivo .csv
 
-    // Parseo de CSV a JSON
-    csvtojson({ delimiter: [";"], }).fromFile('./Revistas/CAICYT.csv').then((json) => // La propiedad delimiter indica porque caracter debe separar
-    {
-      fs.writeFile('./Revistas/CAICYT.json', JSON.stringify(json), error => {
-        if (error) console.log(error);
-      })
+  // Parseo de CSV a JSON
+  csvtojson({ delimiter: [";"], }).fromFile(csvFilePath).then((json) => // La propiedad delimiter indica porque caracter debe separar
+  {
+    fs.writeFile(jsonFilePath, JSON.stringify(json), error => {
+      if (error) console.log(error);
     })
+  })
 
-  }, 5000);  
 }
 
 
 exports.extraerInfoCAICYT = extraerInfoCAICYT;
 exports.sanarDatos = sanarDatos;
+exports.actualizarDatos = actualizarDatos;

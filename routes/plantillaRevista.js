@@ -98,7 +98,6 @@ function armarHTML(tituloSitioWeb){
         <body class='fondoClaro container-fluid'>
 
             <h1 style="text-align: center;">${tituloSitioWeb}</h1>
-            
     `
 
     // Foto de la revista
@@ -165,6 +164,8 @@ function armarHTML(tituloSitioWeb){
     // Botón de actualizar tabla y botón de volver
     pagina +=
         `
+            <span id="estadoDeLaActualización"></span>
+
             <p>Última actualización: ${fechaUltimaModicacion.getDate()}/${fechaUltimaModicacion.getMonth()+1}/${fechaUltimaModicacion.getFullYear()} (DD/MM/YY)</p>
             <p><button id="actualizarCatalogo">Actualizar catálogo de revistas</button></p>
 
