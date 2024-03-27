@@ -5,7 +5,7 @@ const fs = require('fs');                 // Módulo para trabajar con archivos 
 const path = require('path');             // Módulo para trabajar con paths
 const chokidar = require('chokidar');     // Módulo para poder detectar la creación de archivos
 
-const plantilla = require('./plantillaRevista.js')
+const armadoDeTabla = require('./armadoDeTabla.js')
 
 /*****************************************************************************************************************************/
 // ENRUTAMIENTO: MANEJO DE PETICIONES POST
@@ -16,9 +16,13 @@ router.post('/paginaSiguiente', function(req, res){
     try
     {
         let datos = '';
+        let tituloSitioWeb = req.body.tituloSitioWeb;
 
-        const archivoJSON    = require(`../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`);
-        let revistas         = plantilla.crearListado(archivoJSON);
+        const archivoJSON    = require(`../SGE_Arg/Revistas/${tituloSitioWeb}.json`);
+        let revistas;
+        if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   revistas = armadoDeTabla.crearListadoEspecial(archivoJSON)
+        else                                                            revistas = armadoDeTabla.crearListado(archivoJSON)
+
         let cantidadRevistas = archivoJSON.length;
         let cantidaPaginas   = Math.ceil(cantidadRevistas / 20);
 
@@ -35,7 +39,8 @@ router.post('/paginaSiguiente', function(req, res){
                 else                      las20RevistasDelaPagina.push(revistas[i]);
             }
 
-            datos = plantilla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaSiguiente);
+            if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   datos = armadoDeTabla.armarTablaDeRevistasCasosEspeciales(las20RevistasDelaPagina, paginaSiguiente)
+            else                                                            datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaSiguiente)
         }
 
         res.send(datos);
@@ -53,9 +58,12 @@ router.post('/paginaAnterior', function(req, res){
     try
     {
         let datos = '';
+        let tituloSitioWeb = req.body.tituloSitioWeb;
 
-        const archivoJSON    = require(`../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`);
-        let revistas         = plantilla.crearListado(archivoJSON);
+        const archivoJSON    = require(`../SGE_Arg/Revistas/${tituloSitioWeb}.json`);
+        let revistas;
+        if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   revistas = armadoDeTabla.crearListadoEspecial(archivoJSON)
+        else                                                            revistas = armadoDeTabla.crearListado(archivoJSON)
 
         let paginaActual = req.body.paginaActual;
         let paginaAnterior = paginaActual - 1;
@@ -68,7 +76,8 @@ router.post('/paginaAnterior', function(req, res){
                 las20RevistasDelaPagina.push(revistas[i]);
             }
 
-            datos = plantilla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaAnterior);
+            if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   datos = armadoDeTabla.armarTablaDeRevistasCasosEspeciales(las20RevistasDelaPagina, paginaAnterior)
+            else                                                            datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaAnterior)
         }
 
         res.send(datos);
@@ -86,9 +95,12 @@ router.post('/primeraPagina', function(req, res){
     try
     {
         let datos = '';
+        let tituloSitioWeb = req.body.tituloSitioWeb;
 
-        const archivoJSON    = require(`../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`);
-        let revistas         = plantilla.crearListado(archivoJSON);
+        const archivoJSON    = require(`../SGE_Arg/Revistas/${tituloSitioWeb}.json`);
+        let revistas;
+        if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   revistas = armadoDeTabla.crearListadoEspecial(archivoJSON)
+        else                                                            revistas = armadoDeTabla.crearListado(archivoJSON)
 
         let las20RevistasDelaPagina = [];
 
@@ -98,7 +110,8 @@ router.post('/primeraPagina', function(req, res){
             else                      las20RevistasDelaPagina.push(revistas[i]);
         }
 
-        datos = plantilla.armarTablaDeRevistas(las20RevistasDelaPagina, 1);
+        if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   datos = armadoDeTabla.armarTablaDeRevistasCasosEspeciales(las20RevistasDelaPagina, 1)
+        else                                                            datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, 1)
 
         res.send(datos);
     }
@@ -115,9 +128,12 @@ router.post('/ultimaPagina', function(req, res){
     try
     {
         let datos = '';
+        let tituloSitioWeb = req.body.tituloSitioWeb;
 
         const archivoJSON    = require(`../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`);
-        let revistas         = plantilla.crearListado(archivoJSON);
+        let revistas;
+        if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   revistas = armadoDeTabla.crearListadoEspecial(archivoJSON)
+        else                                                            revistas = armadoDeTabla.crearListado(archivoJSON)
         let cantidadRevistas = archivoJSON.length;
         let cantidaPaginas   = Math.ceil(cantidadRevistas / 20);
 
@@ -129,7 +145,8 @@ router.post('/ultimaPagina', function(req, res){
             else                      las20RevistasDelaPagina.push(revistas[i]);
         }
 
-        datos = plantilla.armarTablaDeRevistas(las20RevistasDelaPagina, cantidaPaginas);
+        if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   datos = armadoDeTabla.armarTablaDeRevistasCasosEspeciales(las20RevistasDelaPagina, cantidaPaginas)
+        else                                                            datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, cantidaPaginas)
 
         res.send(datos);
     }
@@ -146,9 +163,14 @@ router.post('/buscarPaginaEspecifica', function(req, res){
     try
     {
         let datos = '';
+        let tituloSitioWeb = req.body.tituloSitioWeb;
 
-        const archivoJSON    = require(`../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`);
-        let revistas         = plantilla.crearListado(archivoJSON);
+        const archivoJSON    = require(`../SGE_Arg/Revistas/${tituloSitioWeb}.json`);
+
+        let revistas;
+        if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   revistas = armadoDeTabla.crearListadoEspecial(archivoJSON)
+        else                                                            revistas = armadoDeTabla.crearListado(archivoJSON)
+
         let cantidadRevistas = archivoJSON.length;
         let cantidaPaginas   = Math.ceil(cantidadRevistas / 20);
 
@@ -163,7 +185,8 @@ router.post('/buscarPaginaEspecifica', function(req, res){
                 else                      las20RevistasDelaPagina.push(revistas[i]);
             }
 
-            datos = plantilla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaBuscada);
+            if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   datos = armadoDeTabla.armarTablaDeRevistasCasosEspeciales(las20RevistasDelaPagina, paginaBuscada)
+            else                                                            datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaBuscada)
         }
 
         res.send(datos);
@@ -217,6 +240,10 @@ router.post('/actualizarCatalogo', function(req, res){
                 archivoDeExtraccion.extraerInfoScimagojr();
                 break;
 
+            case 'Biblat':
+                archivoDeExtraccion.extraerInfoBiblat();
+                break;
+
             case 'Listado de revistas':
                 let archivoArmadoDeListado = require('../SGE_Arg/listadoRevistas.js');
                 archivoArmadoDeListado.crearListado();
@@ -233,7 +260,7 @@ router.post('/actualizarCatalogo', function(req, res){
             let vigilante = fs.watch(path.join(__dirname, `../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`), function (tipoDeEvento, nombreArchivo){ // Cuando detecta una modificación en el archivo, se ejecuta la función
                 
                 vigilante.close();
-                clearTimeout(timeOut);
+                //clearTimeout(timeOut);
     
                 console.log("Extracción de datos completa");
                 res.send("Actualización exitosa");
@@ -243,10 +270,12 @@ router.post('/actualizarCatalogo', function(req, res){
                 //else                                                 res.redirect(`/revista/${req.body.tituloSitioWeb}`);
             });
 
-            let timeOut = setTimeout(function () { // Si después de 2 minutos todavía no se detecto la creación o modificación de los archivos, se considera que fallo la extracción
+            // Si después de 2 minutos todavía no se detecto la creación o modificación de los archivos, se considera que fallo la extracción
+            // Anda, pero algunas sitios como CAICYT y Biblat tardan más de 2 minutos en actualizarse
+            /*let timeOut = setTimeout(function () { 
                 vigilante.close();
                 res.send("Actualización fallida");   
-            }, 120000);
+            }, 120000);*/
 
         }
         else // Si el archivo JSON no existe y hay que extraer los datos de cero, se ejecuta esto
@@ -256,19 +285,21 @@ router.post('/actualizarCatalogo', function(req, res){
             vigilante.on('add', function(path) { // Cuando detecta la creación del archivo indicado, se ejecuta la función
                 
                 vigilante.close();
-                clearTimeout(timeOut);
+                //clearTimeout(timeOut);
     
                 console.log("Extracción de datos completa");
                 res.send("Actualización exitosa");
     
+                // Otra forma de hacerlo
                 //if(req.body.tituloSitioWeb == 'Listado de revistas') res.redirect(`/revista/listadoRevistas`);
                 //else                                                 res.redirect(`/revista/${req.body.tituloSitioWeb}`);
             });
             
-            let timeOut = setTimeout(function () { 
+            
+            /*let timeOut = setTimeout(function () { 
                 vigilante.close();
                 res.send("Actualización fallida");   
-            }, 120000);
+            }, 120000);*/
         }
 
         

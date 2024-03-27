@@ -1,69 +1,7 @@
 const fs = require('fs');
 const path = require('path'); // Módulo para trabajar con rutas
 
-// Clase para pasar el texto de los archivos JSON a objetos
-class Revista {
-    
-    constructor(tituloRevista, issnImpreso, issnEnLinea, instituto) {
-        this.tituloRevista = tituloRevista;
-        this.issnImpreso   = issnImpreso;
-        this.issnEnLinea   = issnEnLinea;
-        this.instituto     = instituto;
-    }
-
-    toString() {
-        console.log(`Título: ${this.tituloRevista}, ISSN impreso: ${this.issnImpreso}, ISSN en linea: ${this.issnEnLinea}, Instituto: ${this.instituto}`);
-    }
-}
-
-// Crea un arreglo de objetos con la información de las revistas
-function crearListado(archivoJSON){
-
-    var revistas = [];
-    
-    for (var i = 0; i < archivoJSON.length; i++)
-    {
-        if (archivoJSON[i].Título == "HUBO UN ERROR") revistas.push(new Revista("HUBO UN ERROR") );
-        else                                          revistas.push(new Revista(archivoJSON[i].Título, archivoJSON[i]['ISSN impresa'], archivoJSON[i]['ISSN en linea'], archivoJSON[i]['Instituto']));
-    }
-
-    return revistas;
-}
-
-// Crea una tabla HTML con el arreglo de revistas pasado, sin importar el tamaño del arreglo
-function armarTablaDeRevistas(arregloRevistas, numeroPagina){
-
-    let tabla = 
-    `<table id="tablaRevistas" border="1" class="table table-light table-striped table-bordered">
-        <thead>
-            <tr>
-                <th class="text-center">N° Revista</th>
-                <th class="text-center">Titulo</th>
-                <th class="text-center">ISSN impreso</th>
-                <th class="text-center">ISSN electronico</th>
-                <th class="text-center">Instituto/Editorial</th>
-            </tr>
-        </thead>`
-
-    if(numeroPagina > 1) numeroPagina = (numeroPagina * 20) - 19;
-
-    for(let i = 0; i < arregloRevistas.length; i++){
-        tabla += `<tr>
-                    <td class="text-center">${numeroPagina}</td>
-                    <td>${arregloRevistas[i].tituloRevista}</td>
-                    <td class="text-center">${arregloRevistas[i].issnImpreso}</td>
-                    <td class="text-center">${arregloRevistas[i].issnEnLinea}</td>
-                    <td>${arregloRevistas[i].instituto}</td>
-                 </tr>`
-        
-        numeroPagina++;
-    }
-
-    tabla += `</table>`
-
-    return tabla;
-}
-
+const armadoDeTabla = require('./armadoDeTabla.js') // Arma el HTML de las revistas
 
 // Armo el HTML que se va a mostrar. Funciona como una especie de plantilla
 function armarHTML(tituloSitioWeb){
@@ -71,7 +9,10 @@ function armarHTML(tituloSitioWeb){
     delete require.cache[require.resolve(__dirname + `/../SGE_Arg/Revistas/${tituloSitioWeb}.json`)]; // Borra la cache del archivo indicado para que cuando se lo vuevla a llamar al archivo no vuelva con datos viejos
     let archivoJSON    = require(path.join(__dirname + `/../SGE_Arg/Revistas/${tituloSitioWeb}.json`));
 
-    let revistas         = crearListado(archivoJSON);
+    let revistas;
+    if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   revistas = armadoDeTabla.crearListadoEspecial(archivoJSON)
+    else                                                            revistas = armadoDeTabla.crearListado(archivoJSON)
+
     let cantidadRevistas = archivoJSON.length;
     let cantidaPaginas   = Math.ceil(cantidadRevistas / 20);
 
@@ -152,7 +93,9 @@ function armarHTML(tituloSitioWeb){
     `
 
     // La tabla
-    pagina += armarTablaDeRevistas(primeras20Revistas, 1);
+    if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   pagina += armadoDeTabla.armarTablaDeRevistasCasosEspeciales(primeras20Revistas, 1);
+    else                                                            pagina += armadoDeTabla.armarTablaDeRevistas(primeras20Revistas, 1);
+    
 
     // Información sobre la tabla
     if(tituloSitioWeb == 'Listado de revistas') pagina += `<p>Cantidad de revistas argentinas: ${cantidadRevistas}</p>`
@@ -171,7 +114,7 @@ function armarHTML(tituloSitioWeb){
 
             <p><a href="/">Volver</a></p>
 
-            <script src="/javascripts/funcionesPlantillaRevista.js"></script>
+            <script src="/javascripts/funcionesClientePlantillaRevista.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
         </body>
@@ -215,7 +158,7 @@ function armarHTMLvacio(tituloSitioWeb){
                     let tituloSitioWeb = document.getElementById("titulo").innerText;
                 
                     const xhttp = new XMLHttpRequest();    
-                    xhttp.open("POST", "http://localhost:3000/api/actualizarCatalogo", true); 
+                    xhttp.open("POST", "http://localhost:3000/funcionesServidorPlantillaRevista/actualizarCatalogo", true); 
                     xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
                     
                     xhttp.onreadystatechange = function() 
@@ -243,7 +186,5 @@ function armarHTMLvacio(tituloSitioWeb){
     return pagina;
 }
 
-exports.crearListado = crearListado;
-exports.armarTablaDeRevistas = armarTablaDeRevistas;
 exports.armarHTML = armarHTML;
 exports.armarHTMLvacio = armarHTMLvacio;

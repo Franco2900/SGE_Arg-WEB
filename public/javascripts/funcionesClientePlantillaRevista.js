@@ -34,7 +34,7 @@ document.getElementById("buscarPaginaEspecifica").addEventListener("change", fun
     let paginaBuscada = Number(document.getElementById("buscarPaginaEspecifica").value);
 
     const xhttp = new XMLHttpRequest();    
-    xhttp.open("POST", "http://localhost:3000/api/buscarPaginaEspecifica", true); 
+    xhttp.open("POST", "http://localhost:3000/funcionesServidorPlantillaRevista/buscarPaginaEspecifica", true); 
     xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     
     xhttp.onreadystatechange = function() 
@@ -63,7 +63,7 @@ document.getElementById("botonAnterior").addEventListener("click", function(){
     let paginaActual   = Number(document.getElementById("paginaActual").innerText);
 
     const xhttp = new XMLHttpRequest();    
-    xhttp.open("POST", "http://localhost:3000/api/paginaAnterior", true); 
+    xhttp.open("POST", "http://localhost:3000/funcionesServidorPlantillaRevista/paginaAnterior", true); 
     xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     
     xhttp.onreadystatechange = function() 
@@ -93,7 +93,7 @@ document.getElementById("botonSiguiente").addEventListener("click", function(){
     let paginaActual   = Number(document.getElementById("paginaActual").innerText);
 
     const xhttp = new XMLHttpRequest();    
-    xhttp.open("POST", "http://localhost:3000/api/paginaSiguiente", true); 
+    xhttp.open("POST", "http://localhost:3000/funcionesServidorPlantillaRevista/paginaSiguiente", true); 
     xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     
     xhttp.onreadystatechange = function() 
@@ -122,7 +122,7 @@ document.getElementById("botonPrimeraPagina").addEventListener("click", function
     let tituloSitioWeb = document.getElementById("titulo").innerText;
 
     const xhttp = new XMLHttpRequest();    
-    xhttp.open("POST", "http://localhost:3000/api/primeraPagina", true); 
+    xhttp.open("POST", "http://localhost:3000/funcionesServidorPlantillaRevista/primeraPagina", true); 
     xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     
     xhttp.onreadystatechange = function() 
@@ -151,7 +151,7 @@ document.getElementById("botonUltimaPagina").addEventListener("click", function(
     let cantidaPaginas = Number(document.getElementById("cantidaPaginas").innerText);
 
     const xhttp = new XMLHttpRequest();    
-    xhttp.open("POST", "http://localhost:3000/api/ultimaPagina", true); 
+    xhttp.open("POST", "http://localhost:3000/funcionesServidorPlantillaRevista/ultimaPagina", true); 
     xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     
     xhttp.onreadystatechange = function() 
@@ -187,7 +187,7 @@ document.getElementById("actualizarCatalogo").addEventListener("click", function
 
     // Creo y cofiguro el objeto para enviar y recibir solicitudes al servidor
     const xhttp = new XMLHttpRequest();    
-    xhttp.open("POST", "http://localhost:3000/api/actualizarCatalogo", true); 
+    xhttp.open("POST", "http://localhost:3000/funcionesServidorPlantillaRevista/actualizarCatalogo", true); 
     xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
     
     // Le indico que hacer cuando reciba los datos del servidor

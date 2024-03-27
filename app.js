@@ -29,8 +29,8 @@ app.use("/stylesheets", express.static(path.join(__dirname, "/public/stylesheets
 // Indicamos que en dicha url use dicho archivo
 app.use('/', require('./routes/index') );     
 app.use('/users', require('./routes/users') );
-app.use('/revista', require('./routes/revista') );
-app.use('/api', require('./routes/api') );
+app.use('/revista', require('./routes/rutasRevistas') );
+app.use('/funcionesServidorPlantillaRevista', require('./routes/funcionesServidorPlantillaRevista') );
 
 // Atrapa el error 404 (página no encontrada) y lo maneja
 app.use(function(req, res, next) {

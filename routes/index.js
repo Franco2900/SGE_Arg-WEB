@@ -106,10 +106,11 @@ router.get('/', function(req, res, next) {
     pagina +=
     `
       <table class="text-center table table-bordered">
-        <caption>Se considera que una revista tiene datos desactualizados si ya pasaron más de 30 días desde su última actualización</caption>
+        <caption>Se considera que una revista tiene datos desactualizados si ya pasaron más de 365 días desde su última actualización</caption>
         <thead>
           <tr>
             <th>Revista</th>
+            <th>Cantidad de revistas</th>
             <th>Estado</th>
             <th>Ultima actualización (DD/MM/YY)</th>
           </tr>
@@ -117,19 +118,20 @@ router.get('/', function(req, res, next) {
         <tbody>
     `  
 
+    // Crea las filas de la tabla
     for(let i = 0; i < revistas.length; i++){
       
       let fechaUltimaModicacionDelArchivo = "";
       let colorEstadoDelArchivo = "";
       let mensajeEstadoDelArchivo = "";
 
+
       try
       {
         // Me fijo la fecha de modificación del archivo
         let estadisticasDelArchivo;
-        if(revistas[i] == 'Web of Science') estadisticasDelArchivo = fs.statSync(path.join(__dirname + `/../SGE_Arg/Revistas/WoS.json`));
-        else                                estadisticasDelArchivo = fs.statSync(path.join(__dirname + `/../SGE_Arg/Revistas/${revistas[i]}.json`));
-        
+        estadisticasDelArchivo = fs.statSync(path.join(__dirname + `/../SGE_Arg/Revistas/${revistas[i]}.json`));
+
         let fechaModicacion = estadisticasDelArchivo.mtime;
         fechaUltimaModicacionDelArchivo = `${fechaModicacion.getDate()}/${fechaModicacion.getMonth()+1}/${fechaModicacion.getFullYear()}`;
         // getMonth() devuelve un valor entre 0 y 11, siendo 0 el mes de Enero; por eso se le suma uno
@@ -142,7 +144,7 @@ router.get('/', function(req, res, next) {
         diferenciaDeTiempo -= fechaModicacion.getMonth()+1; // Le resto los meses que ya pasaron
         diferenciaDeTiempo *= 30  // A la diferencia en meses la multiplicamos por 30 para tener la diferencia en días
 
-        if(diferenciaDeTiempo > 30) 
+        if(diferenciaDeTiempo > 365) 
         {
           colorEstadoDelArchivo = 'yellow';
           mensajeEstadoDelArchivo = 'Datos desactualizados';
@@ -159,12 +161,24 @@ router.get('/', function(req, res, next) {
         mensajeEstadoDelArchivo = 'No hay datos disponibles';
         colorEstadoDelArchivo = 'red';
       }
-                                                       
+             
+      
+      // Llamo al archivo json para saber cuantas revistas tiene
+      let cantidadRevistas;
+      try
+      {
+        let archivoJSON = require(path.join(__dirname + `/../SGE_Arg/Revistas/${revistas[i]}.json`))
+        cantidadRevistas = archivoJSON.length;
+      }
+      catch(error){
+        cantidadRevistas = 0;
+      }
 
       pagina += 
       `
       <tr>
         <td>${revistas[i]}</td>
+        <td>${cantidadRevistas}</td>
         <td style="background-color: ${colorEstadoDelArchivo};">${mensajeEstadoDelArchivo}</td>
         <td>${fechaUltimaModicacionDelArchivo}</td>
       </tr>
