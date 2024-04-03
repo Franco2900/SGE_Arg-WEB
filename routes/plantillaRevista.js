@@ -1,7 +1,8 @@
-const fs = require('fs');
+const fs   = require('fs');
 const path = require('path'); // Módulo para trabajar con rutas
 
-const armadoDeTabla = require('./armadoDeTabla.js') // Arma el HTML de las revistas
+const armadoDeTabla           = require('./armadoDeTabla.js');             // Arma el HTML de las revistas
+const convertirExcelDeDialnet = require('./convertidorExcelDeDialnet.js'); // Convierte el excel que envía Dialnet por email en archivos .csv y .json
 
 // Armo el HTML que se va a mostrar. Funciona como una especie de plantilla
 function armarHTML(tituloSitioWeb){
@@ -42,8 +43,8 @@ function armarHTML(tituloSitioWeb){
     `
 
     // Foto de la revista
-    if(tituloSitioWeb != 'Listado de revistas') pagina += `<img src="images/${tituloSitioWeb}.jpg" class="mx-auto d-block border border-dark"/> <br/>`
-    else                                        pagina += `<img src="images/${tituloSitioWeb}.jpg" class="mx-auto d-block border border-dark" style="height: 10%; width: 20%;" /> <br/>`
+    if(tituloSitioWeb != 'Listado de revistas') pagina += `<img src="images/${tituloSitioWeb}.jpg"   class="mx-auto d-block border border-dark"/> <br/>`
+    else                                        pagina += `<img src="../images/${tituloSitioWeb}.jpg" class="mx-auto d-block border border-dark" style="height: 10%; width: 20%;"> <br/>`
 
     // Botones arriba de la tabla
     pagina += 
@@ -110,8 +111,36 @@ function armarHTML(tituloSitioWeb){
             <span id="estadoDeLaActualización"></span>
 
             <p>Última actualización: ${fechaUltimaModicacion.getDate()}/${fechaUltimaModicacion.getMonth()+1}/${fechaUltimaModicacion.getFullYear()} (DD/MM/YY)</p>
-            <p><button id="actualizarCatalogo">Actualizar catálogo de revistas</button></p>
+        `
+    // getMonth() devuelve un valor entre 0 y 11, siendo 0 el mes de Enero; por eso se le suma uno
 
+    
+    if(tituloSitioWeb != 'Dialnet') pagina += `<p><button id="actualizarCatalogo">Actualizar catálogo de revistas</button></p>`;
+    else
+    {
+        pagina += 
+        `
+            <p>Dialnet tiene un sistema de protección que impide hacer consultas masivas, por lo cual no podemos extraer la información de su sitio web</p>
+            <p>En su lugar, es necesario enviar un email a: dialnet@unirioja.es </p>
+            <p>Solicitando que envien un excel de las revistas argentinas que tienen en su base de datos. Una vez que le respondan, puede subir el excel con el botón de adelante y nosotros lo procesamos</p>
+
+            <p>
+                <form method="post" action="subirExcelDialnet" enctype="multipart/form-data"> 
+                    Seleccione el excel de Dialnet:
+                    <input type="file" name="excelDialnet">
+                    <br>
+                    <input type="submit" value="Subir archivo">
+                </form>
+            </p>
+        `
+        // La propiedad enctype indica que el formulario adjunta archivos
+        
+    }
+    
+
+    // Botón de volver y archivos Bootstrap y de JavaScript del cliente
+    pagina +=
+        `
             <p><a href="/">Volver</a></p>
 
             <script src="/javascripts/funcionesClientePlantillaRevista.js"></script>
@@ -119,11 +148,11 @@ function armarHTML(tituloSitioWeb){
 
         </body>
     </html>`
-    // getMonth() devuelve un valor entre 0 y 11, siendo 0 el mes de Enero; por eso se le suma uno
     // Todas las funciones de JavaScript del lado del cliente estan en la carpeta public/javascripts. Esto es así para ver el código javascript más facilmente y para no mezclar las etiquetas HTML con el JavaScript del cliente
 
     return pagina;
 }
+
 
 
 function armarHTMLvacio(tituloSitioWeb){
@@ -146,21 +175,23 @@ function armarHTMLvacio(tituloSitioWeb){
     else                                        pagina += `<p>No hay datos disponibles sobre la revista ${tituloSitioWeb}</p> `
 
 
-    pagina += 
-    `    
+    if(tituloSitioWeb != 'Dialnet')
+    {
+        pagina += 
+        `    
             <p>Seleccione la opción 'Actualizar catálogo de revistas' para obtener datos</p>
-            <p><button id="actualizarCatalogo">Actualizar catálogo de revistas</button></p>
-
+                <p><button id="actualizarCatalogo">Actualizar catálogo de revistas</button></p>
+    
             <script>
-
+    
                 document.getElementById("actualizarCatalogo").addEventListener("click", function(){
-
+    
                     let tituloSitioWeb = document.getElementById("titulo").innerText;
-                
+                    
                     const xhttp = new XMLHttpRequest();    
                     xhttp.open("POST", "http://localhost:3000/funcionesServidorPlantillaRevista/actualizarCatalogo", true); 
                     xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-                    
+                        
                     xhttp.onreadystatechange = function() 
                     {         
                         if (this.readyState == 4 && this.status == 200)
@@ -172,16 +203,34 @@ function armarHTMLvacio(tituloSitioWeb){
                     let body = JSON.stringify({tituloSitioWeb: tituloSitioWeb});
                     xhttp.send(body);
                 })
-
+    
             </script>
-
-            <p><a href="/">Volver</a></p>
-
+    
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        `;
+    }
+    else
+    {
+        pagina += 
+        `
+            <p>Dialnet tiene un sistema de protección que impide hacer consultas masivas, por lo cual no podemos extraer la información de su sitio web</p>
+            <p>En su lugar, es necesario enviar un email a: dialnet@unirioja.es </p>
+            <p>Solicitando que envien un excel de las revistas argentinas que tienen en su base de datos. Una vez que le respondan, puede subir el excel con el botón de adelante y nosotros lo procesamos</p>
 
-        </body>
-    </html>
-    `;
+            <p>
+                <form method="post" action="subirExcelDialnet" enctype="multipart/form-data"> 
+                    Seleccione el excel de Dialnet:
+                    <input type="file" name="excelDialnet">
+                    <br>
+                    <input type="submit" value="Subir archivo">
+                </form>
+            </p>
+        `
+        // La propiedad enctype indica que el formulario adjunta archivos
+    }
+
+    pagina += `<p><a href="/">Volver</a></p>
+                </body></html>`
 
     return pagina;
 }

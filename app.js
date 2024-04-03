@@ -21,7 +21,7 @@ app.use(cookieParser());
 
 app.use("/images", express.static(path.join(__dirname, "/public/images")));           // Indico en que path esta la carpeta de imágenes
 app.use("/revista/images", express.static(path.join(__dirname, "/public/images"))); 
-app.use("/revista/listadoRevistas/images", express.static(path.join(__dirname, "/public/images")));
+//app.use("/revista/Listado de revistas/images", express.static(path.join(__dirname, "/public/images"))); // NO SE PORQUE HAY UN PROBLEMA CON LA IMAGEN DE LISTADO DE REVISTAS
 
 app.use("/javascripts", express.static(path.join(__dirname, "/public/javascripts"))); // Indico en que path esta la carpeta de archivos javascripts de lado del cliente
 app.use("/stylesheets", express.static(path.join(__dirname, "/public/stylesheets"))); // Indico en que path esta la carpeta de hojas de estilo

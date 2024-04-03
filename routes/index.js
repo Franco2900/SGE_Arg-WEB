@@ -91,7 +91,7 @@ router.get('/', function(req, res, next) {
     <p>El listado completo de las revistas de todos los sitios web se puede ver aquí</p>
       
     <div class="text-center">
-      <a href="/revista/listadoRevistas/">
+      <a href="/revista/Listado de revistas/">
         <img src="images/Listado de revistas.jpg" class="mx-auto d-block border border-dark" style="height: 10%; width: 20%;">
         <br/>
         Listado de revistas

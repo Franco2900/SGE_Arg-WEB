@@ -1,12 +1,68 @@
 var express = require('express');
 var router = express.Router();
 
-const plantilla = require('./plantillaRevista.js') // Arma el HTML de las revistas
+const multer = require('multer');   // Módulo para subir archivos desde cliente al servidor
+let nombreArchivoExcelDialnet = '';
+const storage = multer.diskStorage({
+    
+    destination: function(req, file, cb){ // Lugar donde se guarda el archivo subido
+        cb(null, `${__dirname}`);
+    },
+
+    filename: function(req, file, cb){ // Nombre con el que se guarda el archivo subido
+        nombreArchivoExcelDialnet = file.originalname;
+        cb(null, file.originalname);
+    }
+
+})
+const subida = multer({ storage }); // Objeto que se encarga de la subida de los archivos
+
+const chokidar = require('chokidar');
+
+const plantilla               = require('./plantillaRevista.js'); // Arma el HTML de las revistas
+const convertirExcelDeDialnet = require('./convertidorExcelDeDialnet.js');
 
 /*****************************************************************************************************************************/
 // ENRUTAMIENTO: MANEJO DE PETICIONES GET
 /*****************************************************************************************************************************/
 
+//let listaDeRevistas = ['CAICYT', 'Latindex', 'DOAJ', 'Redalyc', 'Biblat', 'Scimago', 'Scielo', 'WoS', 'Dialnet', 'Listado de revistas'];
+
+// RUTAS DINAMICAS
+router.get('/:revista', function(req, res, next) {
+
+    try{
+        let pagina = plantilla.armarHTML(req.params.revista);
+        res.send(pagina);
+    }
+    catch(error){
+        let pagina = plantilla.armarHTMLvacio(req.params.revista);
+        res.send(pagina);
+    }
+    
+});
+
+
+
+router.post('/subirExcelDialnet', subida.single('excelDialnet'), function(req, res, next) {
+
+    var watcher = chokidar.watch(__dirname + `/${nombreArchivoExcelDialnet}`); // Archivo que le indico que vigile
+
+    watcher.on('add', function(archivoSubido) { // Ejecuta esta función cuando detecta la creación del archivo
+    
+        console.log('El archivo ' + archivoSubido + ' ha sido subido');
+        convertirExcelDeDialnet.convertir(nombreArchivoExcelDialnet);
+
+        watcher.close();    // Dejo de vigilar
+    });
+
+    res.send(`<p>Archivo ${nombreArchivoExcelDialnet} subido exitosamente<p>
+              <p><a href="/">Volver</a></p>`);
+});
+
+
+// RUTAS HARDCODEADAS
+/*
 // Las rutas no son sensibles a las mayusculas y minusculas, por lo que se las puede llamar más facilmente
 
 router.get('/caicyt', function(req, res, next) {
@@ -146,5 +202,6 @@ router.get('/listadoRevistas', function(req, res, next) {
     }
 
 });
+*/
 
 module.exports = router;
