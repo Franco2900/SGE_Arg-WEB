@@ -171,11 +171,11 @@ async function extraerInfoBiblat() {
 
   // Paso los datos de los objetos a string
   let cantidadRevistasSinISSN = 0;
-  let info = "Título;ISSN" + "\n";
+  let info = "Título;ISSN impresa;ISSN en linea;Instituto" + "\n";
   for(let i = 0; i < registros.length; i++){
 
     if(registros[i].issn != null) {
-      info += `${registros[i].titulo};${registros[i].issn}` + "\n"; // Elimino las revistas que no tengan ISSN
+      info += `${registros[i].titulo};${registros[i].issn};;` + "\n"; // Elimino las revistas que no tengan ISSN
     } 
     else{
       cantidadRevistasSinISSN++;

@@ -170,7 +170,7 @@ async function extraerInfoRevista(enlace, tiempo)
       }
 
       if (instituto.includes("English ed."))     instituto = instituto.replaceAll("English ed.", ""); // Hay una revista que tiene un tercer ISSN de la versión en ingles. Esta no se cuenta porque no es Argentina
-      if (auxISSN != "")                       instituto = instituto.replaceAll(`${auxISSN}`, "");  // Hay una revista que tiene un tercer ISSN de la versión en ingles. Esta no se cuenta porque no es Argentina
+      if (auxISSN != "")                         instituto = instituto.replaceAll(`${auxISSN}`, "");  // Hay una revista que tiene un tercer ISSN de la versión en ingles. Esta no se cuenta porque no es Argentina
       if (instituto.includes(";"))               instituto = instituto.replaceAll(";", ",");
       if (instituto.includes("."))               instituto = instituto.replaceAll(".", "");
       if (instituto.includes("("))               instituto = instituto.replaceAll("(", "");
@@ -231,6 +231,16 @@ async function extraerInfoRevista(enlace, tiempo)
 
   await browser.close();
   return respuesta;
+}
+
+
+function extraerInfo()
+{
+  fs.readFile(csvFilePath, (error, datos) => { // Chequeo si existe el archivo
+    
+    if(error) extraerInfoCAICYT(); // Si no existe, extraigo los datos y lo creo
+    else      sanarDatos();        // Si existe, saneo los datos    
+  })
 }
 
 
@@ -334,6 +344,7 @@ async function sanarDatos()
       console.log("Saneamiento completo");
       console.log(`Se sanearon ${revistasSaneadas} revistas`);
       if(revistasNoSaneadas > 0) console.log(`No se pudo sanear ${revistasNoSaneadas} revistas`);
+
     }
     catch(error)
     {
@@ -345,6 +356,14 @@ async function sanarDatos()
   archivoCSV = archivoCSV.replaceAll("NO SE PUDO SANEAR\n", "HUBO UN ERROR\n"); // Vuelvo a poner como estaba el mensaje de error
   escribirArchivos(archivoCSV); // Vuelvo a escribir los archivos pero ya saneados
 
+  //if(cantidadRevistarASanear == 0) actualizarDatos(); // Si ya estan todos los datos sanados, me fijo si hay datos nuevos
+
+  // Se vuelve a crear el archivo desde cero
+  if(cantidadRevistarASanear == 0) {
+    console.log("Todos los datos estan saneados. Se vuelve a extraer los datos para tenerlos actualizados");
+    extraerInfoCAICYT();
+  }
+
   /*setTimeout(function () {
     if(archivoCSV.includes("HUBO UN ERROR\n")) sanarDatos();
   }, 20000); */
@@ -352,6 +371,7 @@ async function sanarDatos()
 
 
 // Ya que el sitio de CAYCET se cae constantemente, la mejor forma de actualizar los datos es fijarse si en el sitio hay una revista que no este en el archivo JSON y añadirla
+// NO SIRVE
 class Revista {
     
   constructor(tituloRevista, issnImpreso, issnEnLinea, area, instituto) 
@@ -426,12 +446,14 @@ async function actualizarDatos()
     if (auxEnlaces[i].includes("-"))  auxEnlaces[i] = auxEnlaces[i].replaceAll("-", " ");
     if (auxEnlaces[i].includes("/"))  auxEnlaces[i] = auxEnlaces[i].replaceAll("/", "");
     auxEnlaces[i] = auxEnlaces[i].toLowerCase();
-  }
 
+    console.log(i + "-" + auxEnlaces[i] + " - " + auxRevistas[i].tituloRevista);// DEBUG
+  }
 
 
   for(let i = 0; i < enlaces.length; i++)
   {
+    
     // Hago la comparación de los titulos de las revistas con los enlaces, y si dan diferentes es porque se añadio una nueva revista
     if((!auxEnlaces[i].includes(auxRevistas[i].tituloRevista)) ){
            
@@ -493,14 +515,14 @@ function escribirArchivos(info)
   // Parseo de CSV a JSON
   csvtojson({ delimiter: [";"], }).fromFile(csvFilePath).then((json) => // La propiedad delimiter indica porque caracter debe separar
   {
-    fs.writeFile(jsonFilePath, JSON.stringify(json), error => {
+    fs.writeFileSync(jsonFilePath, JSON.stringify(json), error => {
       if (error) console.log(error);
     })
   })
 
 }
 
-
+exports.extraerInfo = extraerInfo;
 exports.extraerInfoCAICYT = extraerInfoCAICYT;
 exports.sanarDatos = sanarDatos;
 exports.actualizarDatos = actualizarDatos;

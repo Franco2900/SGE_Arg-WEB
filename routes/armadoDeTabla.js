@@ -64,6 +64,7 @@ function armarTablaDeRevistas(arregloRevistas, numeroPagina){
 
 
 // Esto es para aquellas sitios web que no distinguen entre ISSN impreso e ISSN electronico. En dichos casos se pone todo en una sola columna. Tampoco brindan información del instituto/editorial de las revistas
+// ANDA, PERO AL FINAL SE DECIDIO MOSTRAR AQUELLOS SITIOS WEB QUE NO DISTINGUEN LOS ISSN CON LOS CAMPOS VACIOS
 class RevistaEspecial {
     
     constructor(tituloRevista, issn) {

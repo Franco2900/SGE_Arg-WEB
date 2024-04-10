@@ -10,9 +10,10 @@ function armarHTML(tituloSitioWeb){
     delete require.cache[require.resolve(__dirname + `/../SGE_Arg/Revistas/${tituloSitioWeb}.json`)]; // Borra la cache del archivo indicado para que cuando se lo vuevla a llamar al archivo no vuelva con datos viejos
     let archivoJSON    = require(path.join(__dirname + `/../SGE_Arg/Revistas/${tituloSitioWeb}.json`));
 
-    let revistas;
+    /*let revistas;
     if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   revistas = armadoDeTabla.crearListadoEspecial(archivoJSON)
-    else                                                            revistas = armadoDeTabla.crearListado(archivoJSON)
+    else                                                            revistas = armadoDeTabla.crearListado(archivoJSON)*/
+    let revistas = armadoDeTabla.crearListado(archivoJSON)
 
     let cantidadRevistas = archivoJSON.length;
     let cantidaPaginas   = Math.ceil(cantidadRevistas / 20);
@@ -94,9 +95,9 @@ function armarHTML(tituloSitioWeb){
     `
 
     // La tabla
-    if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   pagina += armadoDeTabla.armarTablaDeRevistasCasosEspeciales(primeras20Revistas, 1);
-    else                                                            pagina += armadoDeTabla.armarTablaDeRevistas(primeras20Revistas, 1);
-    
+    /*if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   pagina += armadoDeTabla.armarTablaDeRevistasCasosEspeciales(primeras20Revistas, 1);
+    else                                                            pagina += armadoDeTabla.armarTablaDeRevistas(primeras20Revistas, 1);*/
+    pagina += armadoDeTabla.armarTablaDeRevistas(primeras20Revistas, 1);
 
     // Información sobre la tabla
     if(tituloSitioWeb == 'Listado de revistas') pagina += `<p>Cantidad de revistas argentinas: ${cantidadRevistas}</p>`
