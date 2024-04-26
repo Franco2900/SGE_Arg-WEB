@@ -18,7 +18,7 @@ function convertir(nombreExcel)
   if(lineas[0].includes('TITULO,')) lineas[0] = lineas[0].replace('TITULO,', 'Título');
   if(lineas[0].includes('PAIS,'))   lineas[0] = lineas[0].replace('PAIS,', ';');
   if(lineas[0].includes('ISSN'))    lineas[0] = lineas[0].replace('ISSN', 'ISSN impresa');
-  lineas[0] += ';ISSN en linea;Instituto';
+  lineas[0] += ';ISSN en linea;Instituto;URL';
 
   for(let i = 1; i < lineas.length; i++) // Recorre todas las lineas
   { 
@@ -27,7 +27,7 @@ function convertir(nombreExcel)
         if(isNaN(lineas[i][j])) // Elimino el campo código
         {
             //lineas[i] = lineas[i].substring(0, j) + ';' + lineas[i].substring(j+1, lineas[i].length);
-            lineas[i] = lineas[i].substring(j+1, lineas[i].length);
+            lineas[i] = lineas[i].substring(j+1, lineas[i].length) + ";;;" + "https://dialnet.unirioja.es/servlet/revista?codigo=" + lineas[i].substring(0, j);
             break;
         } 
     }
@@ -40,7 +40,7 @@ function convertir(nombreExcel)
   let info = '';
   for(let i = 0; i < lineas.length; i++) 
   {
-      if(lineas[i][lineas[i].length-1] != ';') info += `${lineas[i]};;\n`; // Algunas revistas no tienen ISSN, así que elimino dichas revistas
+    if(!lineas[i].includes(';;;;') ) info += `${lineas[i]}\n`; // Algunas revistas no tienen ISSN, así que elimino dichas revistas
   }
 
   const csvFilePath  = path.join(__dirname + '/../SGE_Arg/Revistas/Dialnet.csv');

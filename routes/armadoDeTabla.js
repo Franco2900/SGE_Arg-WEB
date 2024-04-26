@@ -1,15 +1,16 @@
 // Clase para pasar el texto de los archivos JSON a objetos
 class Revista {
     
-    constructor(tituloRevista, issnImpreso, issnEnLinea, instituto) {
+    constructor(tituloRevista, issnImpreso, issnEnLinea, instituto, url) {
         this.tituloRevista = tituloRevista;
         this.issnImpreso   = issnImpreso;
         this.issnEnLinea   = issnEnLinea;
         this.instituto     = instituto;
+        this.url           = url;
     }
 
     toString() {
-        console.log(`Título: ${this.tituloRevista}, ISSN impreso: ${this.issnImpreso}, ISSN en linea: ${this.issnEnLinea}, Instituto: ${this.instituto}`);
+        console.log(`Título: ${this.tituloRevista}, ISSN impreso: ${this.issnImpreso}, ISSN en linea: ${this.issnEnLinea}, Instituto: ${this.instituto}, URL: ${this.url}`);
     }
 }
 
@@ -21,7 +22,7 @@ function crearListado(archivoJSON){
     for (var i = 0; i < archivoJSON.length; i++)
     {
         if (archivoJSON[i].Título == "HUBO UN ERROR") revistas.push(new Revista("HUBO UN ERROR") );
-        else                                          revistas.push(new Revista(archivoJSON[i].Título, archivoJSON[i]['ISSN impresa'], archivoJSON[i]['ISSN en linea'], archivoJSON[i]['Instituto']));
+        else                                          revistas.push(new Revista(archivoJSON[i].Título, archivoJSON[i]['ISSN impresa'], archivoJSON[i]['ISSN en linea'], archivoJSON[i]['Instituto'], archivoJSON[i]['URL']));
     }
 
     return revistas;
@@ -45,9 +46,14 @@ function armarTablaDeRevistas(arregloRevistas, numeroPagina){
     if(numeroPagina > 1) numeroPagina = (numeroPagina * 20) - 19;
 
     for(let i = 0; i < arregloRevistas.length; i++){
+
+        let tituloRevista;
+        if(typeof(arregloRevistas[i].url) !== 'undefined') tituloRevista = `<td><a href="${arregloRevistas[i].url}" target="_blank">${arregloRevistas[i].tituloRevista}</a></td>`;
+        else                                               tituloRevista = `<td>${arregloRevistas[i].tituloRevista}</td>`;
+
         tabla += `<tr>
                     <td class="text-center">${numeroPagina}</td>
-                    <td>${arregloRevistas[i].tituloRevista}</td>
+                    ${tituloRevista}
                     <td class="text-center">${arregloRevistas[i].issnImpreso}</td>
                     <td class="text-center">${arregloRevistas[i].issnEnLinea}</td>
                     <td>${arregloRevistas[i].instituto}</td>

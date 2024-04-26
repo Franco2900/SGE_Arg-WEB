@@ -36,6 +36,7 @@ router.get('/:revista', function(req, res, next) {
         res.send(pagina);
     }
     catch(error){
+        console.log(error);
         let pagina = plantilla.armarHTMLvacio(req.params.revista);
         res.send(pagina);
     }

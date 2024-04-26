@@ -14,17 +14,17 @@ const WoS  = require('./modulos de extraccion/WoS.js');
 const Scimagojr  = require('./modulos de extraccion/Scimago.js');
 
 // APIs (los brindan los sitios web)
-//const DOAJ = require('./APIs/DOAJ API.js');
+const DOAJ = require('./modulos de extraccion/DOAJ.js');
 
 
 // Extracción de datos
 //CAICYT.extraerInfoCAICYT();
 //CAICYT.sanarDatos();
-CAICYT.actualizarDatos();
+//CAICYT.actualizarDatos();
 //Redalyc.extraerInfoRedalyc();
 //Latindex.extraerInfoLatindex();
 //Latindex.extraerInfoLatindexLite();
-//DOAJ.extraerInfoDOAJ();
+DOAJ.extraerInfoDOAJ();
 //Biblat.extraerInfoBiblat();
 //Scielo.extraerInfoScielo();
 //WoS.extraerInfoWoS();

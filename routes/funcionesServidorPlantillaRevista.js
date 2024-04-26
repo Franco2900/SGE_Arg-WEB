@@ -5,7 +5,8 @@ const fs = require('fs');                 // Módulo para trabajar con archivos 
 const path = require('path');             // Módulo para trabajar con paths
 const chokidar = require('chokidar');     // Módulo para poder detectar la creación de archivos
 
-const armadoDeTabla = require('./armadoDeTabla.js')
+const armadoDeTabla = require('./armadoDeTabla.js');
+const calculadoraTiempoPromedioActualizacion = require('./calculadoraTiempoPromedioActualizacion.js');
 
 /*****************************************************************************************************************************/
 // ENRUTAMIENTO: MANEJO DE PETICIONES POST
@@ -264,6 +265,14 @@ router.post('/actualizarCatalogo', function(req, res){
         }
         
 
+        let segundos = 0;
+
+        function sumarSegundo(){
+            segundos++;
+        }
+        
+        let contadorDeSegundos = setInterval(sumarSegundo, 1000); // Cada 1 segundo se llama a la función sumar segundo
+
 
         if(fs.existsSync(path.join(__dirname, `../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`)) ) // Si el archivo JSON ya existe y solo se actualiza, se ejecuta esto
         { 
@@ -278,6 +287,17 @@ router.post('/actualizarCatalogo', function(req, res){
                 // Otra forma de hacerlo
                 //if(req.body.tituloSitioWeb == 'Listado de revistas') res.redirect(`/revista/listadoRevistas`);
                 //else                                                 res.redirect(`/revista/${req.body.tituloSitioWeb}`);
+
+                clearInterval(contadorDeSegundos); // Paro el contador
+                console.log(`Se tardo ${segundos} segundos en extraer los datos`);
+                console.log('*************************************')
+
+                fs.appendFile(path.join(__dirname, `../SGE_Arg/Tiempos/${req.body.tituloSitioWeb}Tiempo.txt`), `${segundos};`, error => 
+                { 
+                    if(error) console.log(error);
+                })
+
+                calculadoraTiempoPromedioActualizacion.calcular(req.body.tituloSitioWeb);
             });
 
             // Si después de 2 minutos todavía no se detecto la creación o modificación de los archivos, se considera que fallo la extracción
@@ -303,6 +323,15 @@ router.post('/actualizarCatalogo', function(req, res){
                 // Otra forma de hacerlo
                 //if(req.body.tituloSitioWeb == 'Listado de revistas') res.redirect(`/revista/listadoRevistas`);
                 //else                                                 res.redirect(`/revista/${req.body.tituloSitioWeb}`);
+
+                clearInterval(contadorDeSegundos); // Paro el contador
+                console.log(`Se tardo ${segundos} segundos en extraer los datos`);
+
+                // Se supone que si no existe el archivo JSON, tampoco existe el archivo con todos los tiempos de extracción
+                fs.writeFile(path.join(__dirname, `../SGE_Arg/Tiempos/${req.body.tituloSitioWeb}Tiempo.txt`), `${segundos};`, error => 
+                { 
+                    if(error) console.log(error);
+                })
             });
             
             

@@ -1,8 +1,55 @@
 const fs             = require('fs');        // Módulo para leer y escribir archivos
 const XMLHttpRequest = require('xhr2');      // Módulo para comunicarse con las APIs
 const csvtojson      = require('csvtojson')  // Módulo para pasar texto csv a json
+var mysql            = require('mysql')      // Módulo para trabajar con la base de datos MySQL
 
-function extraerInfoDOAJ(paginaActual = 1, revista = 1, info = "Título;ISSN impresa;ISSN en linea;Instituto;Editora\n")
+/*
+var conexion = mysql.createConnection({ // Creo una conexión a la base de datos
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'basedepracticasbarc'
+})
+
+conexion.connect(function (error) { // Me conecto a la base de datos
+    
+    if (error) console.log('Problemas de conexion con mysql')
+    else 
+    {
+        console.log('Se inicio conexión');
+
+        // Con la función query introducimos los comandos SQL
+        // Siempre que llamamos a query debemos pasarle, además del string con el comando SQL, un segundo parámetro que se trata de una función que se llama en caso de error
+
+        // Si existe la tabla, la borro. Esto lo hago para actualizar los datos correctamente
+        conexion.query('DROP TABLE IF EXISTS articulo', (error, resultado) => 
+        {
+        if (error) console.log(error)
+        })
+        
+        // Creo la tabla si no existe
+        conexion.query(  
+            `CREATE TABLE IF NOT EXISTS DOAJ 
+            (
+                ID               INT PRIMARY KEY AUTO_INCREMENT,
+                ISSN_impreso     VARCHAR(50),
+                ISSN_electronico VARCHAR(50),
+                Instituto        VARCHAR(50)
+            )`, 
+            function (error, resultado) {
+            if (error) 
+            {
+                console.log(error)
+                return
+            }
+            // NOTA: No importa como escribamos las tablas. En MySQL se pasan automaticamente a minusculas (lo mismo pasa con las bases de datos)
+        })
+    }
+})
+*/
+
+
+function extraerInfoDOAJ(paginaActual = 1, revista = 1, info = "Título;ISSN impresa;ISSN en linea;Instituto;Editora;URL\n")
 {    
     const API_URL = "https://doaj.org/api/"; // URL a la que vamos a pedir los datos
 
@@ -73,7 +120,11 @@ function filtro(info, limite, revista, respuestaJSON)
         else if(typeof(respuestaJSON.results[i].bibjson.publisher.name) == "undefined") editora = "";
         else                                                                            editora = respuestaJSON.results[i].bibjson.publisher.name.trim().replaceAll(";", ",");
 
-        info += `${titulo};${pissn};${eissn};${nombreInstituto};${editora}\n`;
+        let urlRevista;
+        if(eissn != "") urlRevista = "https://doaj.org/toc/" + eissn;
+        else            urlRevista = "https://doaj.org/toc/" + pissn;
+
+        info += `${titulo};${pissn};${eissn};${nombreInstituto};${editora};${urlRevista}\n`;
 
         // Muestro en consola la info de la revista
         console.log(`***********************************************************************************`);
@@ -84,7 +135,24 @@ function filtro(info, limite, revista, respuestaJSON)
         console.log(`ISSN en linea: ${eissn}`);
         console.log(`Instituto: ${nombreInstituto}`);
         console.log(`Editora: ${editora}`);
+        console.log(`URL: ${urlRevista}`);
         console.log(`***********************************************************************************`);
+
+
+        /*const registro = {
+            ISSN_impreso:      pissn,
+            ISSN_electronico:  eissn,
+            Instituto:         nombreInstituto
+        }
+        
+        // Inserto la nueva revista
+        conexion.query('INSERT INTO doaj SET ?', registro, function (error, resultado) {
+            if (error) 
+            {
+              console.log(error)
+              return
+            }
+        })*/
 
         revista++;
     }
@@ -96,13 +164,13 @@ function filtro(info, limite, revista, respuestaJSON)
 function escribirInfo(info)
 {
     // Escribo la info en el archivo .csv
-    fs.writeFile('./SGE_Arg/Revistas/DOAJ.csv', info, error => 
+    fs.writeFileSync('./SGE_Arg/Revistas/DOAJ.csv', info, error => 
     { 
         if(error) console.log(error);
     })
 
 
-    setTimeout(function () { // Le indico al programa que espere 5 segundos antes de seguir porque tarda en crearse el archivo .csv
+    setTimeout(function () { // Lo que esta acá se va a ejecutar después de 5 segundos porque tarda en crearse el archivo .csv. Mientras tanto se ejecuta el código que hay despues de esto
 
         // Parseo de CSV a JSON
         csvtojson({delimiter: [";"],}).fromFile('./SGE_Arg/Revistas/DOAJ.csv').then((json) => // La propiedad delimiter indica porque caracter debe separar
@@ -113,9 +181,9 @@ function escribirInfo(info)
             })
         })
         
-        setTimeout(() => ordenamiento(), 20000);
+        //setTimeout(() => ordenamiento(), 20000); // ANDA PERO LO DEJO COMENTADO PARA QUE VAYA MÁS RÁPIDO
 
-    }, 20000);
+    }, 5000);
 
     //ESTO ES PARA DEBUGEAR, GUARDA EL JSON CRUDO EN UN TXT ASI LO PONEMOS DESPUES EN JSONVIEWER
     /*fs.writeFile('./Revistas/DOAJ.txt', this.response, error => 

@@ -205,9 +205,10 @@ async function extraerInfoRevista(enlace, tiempo)
       console.log(`ISSN en linea: ${issnEnLinea}`);
       console.log(`Área: ${area}`);
       console.log(`Instituto: ${instituto}`);
+      console.log(`URL: ${enlace}`)
       console.log(`***********************************************************************************`);
 
-      respuesta = `${titulo};${issnImpresa};${issnEnLinea};${area};${instituto}` + '\n';
+      respuesta = `${titulo};${issnImpresa};${issnEnLinea};${area};${instituto};${enlace}` + '\n';
     }
     catch (error) {
       respuesta = "HUBO UN ERROR" + "\n";
@@ -252,7 +253,7 @@ async function extraerInfoCAICYT()
   const enlaces = await buscarEnlacesARevistas(120000);
   console.log(`CANTIDAD DE REVISTAS ${enlaces.length}`);
 
-  var info = "Título;ISSN impresa;ISSN en linea;Área;Instituto" + "\n"; // No usar las tildes inclinadas (` `) acá porque al ser la línea cabecera genera error al crear el archivo csv
+  var info = "Título;ISSN impresa;ISSN en linea;Área;Instituto;URL" + "\n"; // No usar las tildes inclinadas (` `) acá porque al ser la línea cabecera genera error al crear el archivo csv
   var auxError = 0;
 
   try

@@ -1,14 +1,24 @@
 const fs   = require('fs');
 const path = require('path'); // Módulo para trabajar con rutas
 
-const armadoDeTabla           = require('./armadoDeTabla.js');             // Arma el HTML de las revistas
-const convertirExcelDeDialnet = require('./convertidorExcelDeDialnet.js'); // Convierte el excel que envía Dialnet por email en archivos .csv y .json
+const armadoDeTabla = require('./armadoDeTabla.js');             // Arma el HTML de las revistas
 
 // Armo el HTML que se va a mostrar. Funciona como una especie de plantilla
 function armarHTML(tituloSitioWeb){
 
     delete require.cache[require.resolve(__dirname + `/../SGE_Arg/Revistas/${tituloSitioWeb}.json`)]; // Borra la cache del archivo indicado para que cuando se lo vuevla a llamar al archivo no vuelva con datos viejos
     let archivoJSON    = require(path.join(__dirname + `/../SGE_Arg/Revistas/${tituloSitioWeb}.json`));
+
+    let archivoTiempo;
+    let archivoTiempoEncontrado = false;
+    try{
+        delete require.cache[require.resolve(__dirname + `/../SGE_Arg/Tiempos/${tituloSitioWeb}TiempoPromedio.json`)];
+        archivoTiempo  = require(path.join(__dirname + `/../SGE_Arg/Tiempos/${tituloSitioWeb}TiempoPromedio.json`));
+        archivoTiempoEncontrado = true;
+    }
+    catch(error){
+        console.log("No se encuentra el archivo de tiempo promedio");
+    }
 
     /*let revistas;
     if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   revistas = armadoDeTabla.crearListadoEspecial(archivoJSON)
@@ -116,7 +126,12 @@ function armarHTML(tituloSitioWeb){
     // getMonth() devuelve un valor entre 0 y 11, siendo 0 el mes de Enero; por eso se le suma uno
 
     
-    if(tituloSitioWeb != 'Dialnet') pagina += `<p><button id="actualizarCatalogo">Actualizar catálogo de revistas</button></p>`;
+    if(tituloSitioWeb != 'Dialnet') 
+    {
+        pagina += `<p><button id="actualizarCatalogo">Actualizar catálogo de revistas</button></p>`;
+
+        if(archivoTiempoEncontrado) pagina += `<p>Tiempo promedio de actualización: ${archivoTiempo[0].TiempoPromedio} segundos</p>`;
+    }
     else
     {
         pagina += 
@@ -151,8 +166,10 @@ function armarHTML(tituloSitioWeb){
     </html>`
     // Todas las funciones de JavaScript del lado del cliente estan en la carpeta public/javascripts. Esto es así para ver el código javascript más facilmente y para no mezclar las etiquetas HTML con el JavaScript del cliente
 
+
     return pagina;
 }
+
 
 
 

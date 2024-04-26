@@ -35,7 +35,7 @@ async function extraerInfoRedalyc()
 
 
         // Empiezo la extracción de datos
-        var info = "Título;ISSN impresa;ISSN en linea;Instituto" + "\n";           // Info que quiero extraer
+        var info = "Título;ISSN impresa;ISSN en linea;Instituto;URL" + "\n";           // Info que quiero extraer
         for(var paginaActual = 1; paginaActual <= cantidadPaginas; paginaActual++) // Para recorrer todas las páginas
         {
             console.log(`PÁGINA ACTUAL: ${paginaActual}`);
@@ -54,6 +54,7 @@ async function extraerInfoRedalyc()
             for(var i = 0; i < revistas.length; i++) // Para extraer la info de cada página
             {
                 var titulo = revistas[i].querySelectorAll("h4 a")[0].textContent;
+                var url = 'https://www.redalyc.org/' + revistas[i].querySelectorAll("h4 a")[0].href 
 
                 var issnImpresa = "";
                 var issnEnLinea = "";
@@ -75,9 +76,10 @@ async function extraerInfoRedalyc()
                 console.log(`ISSN impresa: ${issnImpresa}`);
                 console.log(`ISSN en linea: ${issnEnLinea}`);
                 console.log(`Instituto: ${instituto}`);
+                console.log(`URL: ${url}`);
                 console.log(`***********************************************************************************`);
 
-                info += `${titulo};${issnImpresa};${issnEnLinea};${instituto}` + "\n";
+                info += `${titulo};${issnImpresa};${issnEnLinea};${instituto};${url}` + "\n";
             }
  
         }

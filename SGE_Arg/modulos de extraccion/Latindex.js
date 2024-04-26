@@ -225,7 +225,7 @@ async function extraerInfoLatindexLite() {
       {
         const archivoDescargado = require(archivoDescargadoPath)
 
-        var info = "Título;ISSN en linea;ISSN impresa;ISSN-L;Instituto" + "\n";
+        var info = "Título;ISSN en linea;ISSN impresa;ISSN-L;Instituto;URL" + "\n";
         for (var i = 0; i < archivoDescargado.length; i++) {
 
           let issnElectronico = "";
@@ -237,7 +237,10 @@ async function extraerInfoLatindexLite() {
           let editorial = "";
           if(archivoDescargado[i].nombre_edi != null) editorial = archivoDescargado[i].nombre_edi.replaceAll(";", ",");
 
-          info += `${archivoDescargado[i].tit_propio};${issnElectronico};${issnImpreso};${archivoDescargado[i].issn_l};${editorial}` + `\n`;
+          let url = "";
+          if(archivoDescargado[i].folio_u != null) url = `https://www.latindex.org/latindex/ficha/${archivoDescargado[i].folio_u}`;
+
+          info += `${archivoDescargado[i].tit_propio};${issnElectronico};${issnImpreso};${archivoDescargado[i].issn_l};${editorial};${url}` + `\n`;
         }
 
         const csvFilePath  = path.join(__dirname + '/../Revistas/Latindex.csv');
