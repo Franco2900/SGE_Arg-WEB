@@ -130,7 +130,7 @@ async function extraerInfoRevista(enlaces) {
     }
     
       //console.log("REGISTROS: "+revista+" "+issn);
-      registros.push({ titulo, issn });
+      registros.push({ titulo, issn, enlace });
     } catch (error) {
       console.error(`Error al procesar enlace: ${enlace}`);
       console.error(error);
@@ -171,11 +171,11 @@ async function extraerInfoBiblat() {
 
   // Paso los datos de los objetos a string
   let cantidadRevistasSinISSN = 0;
-  let info = "Título;ISSN impresa;ISSN en linea;Instituto" + "\n";
+  let info = "Título;ISSN impresa;ISSN en linea;Instituto;URL" + "\n";
   for(let i = 0; i < registros.length; i++){
 
     if(registros[i].issn != null) {
-      info += `${registros[i].titulo};${registros[i].issn};;` + "\n"; // Elimino las revistas que no tengan ISSN
+      info += `${registros[i].titulo};${registros[i].issn};;;${registros[i].enlace}` + "\n"; // Elimino las revistas que no tengan ISSN
     } 
     else{
       cantidadRevistasSinISSN++;
