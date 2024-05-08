@@ -1,8 +1,11 @@
 let botonCambiarFondo = document.getElementById("botonCambiarFondo");
                 
 botonCambiarFondo.addEventListener("click", function(){
-                    
-    if(botonCambiarFondo.innerText == "Modo claro") 
+    
+    let fondoPantallaActual = botonCambiarFondo.innerText;
+    let nuevoFondo = "";
+    
+    if(fondoPantallaActual == "Modo claro") 
     {
         document.getElementsByTagName("body")[0].classList.remove('fondoClaro');
         document.getElementsByTagName("body")[0].classList.add('fondoOscuro');
@@ -11,6 +14,8 @@ botonCambiarFondo.addEventListener("click", function(){
         botonCambiarFondo.setAttribute('class', 'bi bi-lightbulb-off');
 
         document.getElementById("tablaRevistas").setAttribute('class', 'table table-dark table-striped table-bordered');
+        
+        nuevoFondo = "Modo oscuro";
     }
     else 
     {
@@ -21,8 +26,17 @@ botonCambiarFondo.addEventListener("click", function(){
         botonCambiarFondo.setAttribute('class', 'bi bi-lightbulb');
 
         document.getElementById("tablaRevistas").setAttribute('class', 'table table-light table-striped table-bordered');
+
+        nuevoFondo = "Modo claro";
     }
-                    
+    
+    
+    const xhttp = new XMLHttpRequest();    
+    xhttp.open("POST", "http://localhost:3000/funcionesServidor/fondoPantalla", true); 
+    xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+    let body = JSON.stringify({nuevoFondo: nuevoFondo});
+    xhttp.send(body);
 });
 
 /***********************************************************************************************************************/

@@ -4,7 +4,7 @@ const path = require('path'); // Módulo para trabajar con rutas
 const armadoDeTabla = require('./armadoDeTabla.js');             // Arma el HTML de las revistas
 
 // Armo el HTML que se va a mostrar. Funciona como una especie de plantilla
-function armarHTML(tituloSitioWeb){
+function armarHTML(tituloSitioWeb, cookies){
 
     delete require.cache[require.resolve(__dirname + `/../SGE_Arg/Revistas/${tituloSitioWeb}.json`)]; // Borra la cache del archivo indicado para que cuando se lo vuevla a llamar al archivo no vuelva con datos viejos
     let archivoJSON    = require(path.join(__dirname + `/../SGE_Arg/Revistas/${tituloSitioWeb}.json`));
@@ -36,6 +36,17 @@ function armarHTML(tituloSitioWeb){
     }
 
 
+    // Manejo de cookies
+    fondo = 'fondoClaro'; // Valor por defecto
+    let botonFondo = '<button id="botonCambiarFondo" class="bi bi-lightbulb">Modo claro</button>';
+    
+    if(cookies.fondoPantalla && cookies.fondoPantalla == "Modo oscuro"){ // Si existe la cookie y esta en Modo oscuro
+        fondo = 'fondoOscuro';
+        botonFondo = '<button id="botonCambiarFondo" class="bi bi-lightbulb-off">Modo oscuro</button>'
+    }
+    
+
+    // Comienza el template
     let pagina = 
     `<!DOCTYPE html>
     <html>
@@ -48,14 +59,15 @@ function armarHTML(tituloSitioWeb){
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
         </head>
-        <body class='fondoClaro container-fluid'>
+        <body class='${fondo} container-fluid'>
 
             <h1 style="text-align: center;">${tituloSitioWeb}</h1>
     `
 
     // Foto de la revista
     if(tituloSitioWeb != 'Listado de revistas') pagina += `<img src="images/${tituloSitioWeb}.jpg"   class="mx-auto d-block border border-dark"/> <br/>`
-    else                                        pagina += `<img src="../images/${tituloSitioWeb}.jpg" class="mx-auto d-block border border-dark" style="height: 10%; width: 20%;"> <br/>`
+    else                                        pagina += `<img src="../images/${tituloSitioWeb}.jpg" class="mx-auto d-block border border-dark" style="height: 10%; width: 20%;"> <br/>` 
+
 
     // Botones arriba de la tabla
     pagina += 
@@ -63,7 +75,7 @@ function armarHTML(tituloSitioWeb){
             <div class="row">
 
                 <div class="col-md-6 text-start">
-                    <button id="botonCambiarFondo" class="bi bi-lightbulb">Modo claro</button>
+                    ${botonFondo}
                 </div>
 
                 <div class="col-md-6 text-end">
@@ -107,7 +119,7 @@ function armarHTML(tituloSitioWeb){
     // La tabla
     /*if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   pagina += armadoDeTabla.armarTablaDeRevistasCasosEspeciales(primeras20Revistas, 1);
     else                                                            pagina += armadoDeTabla.armarTablaDeRevistas(primeras20Revistas, 1);*/
-    pagina += armadoDeTabla.armarTablaDeRevistas(primeras20Revistas, 1);
+    pagina += armadoDeTabla.armarTablaDeRevistas(cookies, primeras20Revistas, 1);
 
     // Información sobre la tabla
     if(tituloSitioWeb == 'Listado de revistas') pagina += `<p>Cantidad de revistas argentinas: ${cantidadRevistas}</p>`
@@ -130,7 +142,21 @@ function armarHTML(tituloSitioWeb){
     {
         pagina += `<p><button id="actualizarCatalogo">Actualizar catálogo de revistas</button></p>`;
 
-        if(archivoTiempoEncontrado) pagina += `<p>Tiempo promedio de actualización: ${archivoTiempo[0].TiempoPromedio} segundos</p>`;
+        if(archivoTiempoEncontrado)
+        {
+            let tiempoPromedio = archivoTiempo[0].TiempoPromedio;
+
+            if(tiempoPromedio >= 60) // Si el tiempo promedio es mayor a un minuto
+            {
+                let minutos  = Math.floor(tiempoPromedio / 60);
+                let segundos = tiempoPromedio % 60;
+                pagina += `<p>Tiempo promedio de actualización: ${minutos} minutos ${segundos} segundos</p>`;
+            } 
+            else{
+                pagina += `<p>Tiempo promedio de actualización: ${tiempoPromedio} segundos</p>`;
+            }
+            
+        }
     }
     else
     {

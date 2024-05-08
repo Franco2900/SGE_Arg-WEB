@@ -4,7 +4,7 @@ var express      = require('express');
 var path         = require('path');
 var cookieParser = require('cookie-parser');
 var logger       = require('morgan');
-
+const bodyParser = require('body-parser') // Módulo para trabajar con las solicitudes POST
 
 var app = express(); // Creo una aplicación express
 
@@ -19,6 +19,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
 app.use("/images", express.static(path.join(__dirname, "/public/images")));           // Indico en que path esta la carpeta de imágenes
 app.use("/revista/images", express.static(path.join(__dirname, "/public/images"))); 
 //app.use("/revista/Listado de revistas/images", express.static(path.join(__dirname, "/public/images"))); // NO SE PORQUE HAY UN PROBLEMA CON LA IMAGEN DE LISTADO DE REVISTAS
@@ -30,6 +33,8 @@ app.use("/stylesheets", express.static(path.join(__dirname, "/public/stylesheets
 app.use('/', require('./routes/index') );     
 app.use('/users', require('./routes/users') );
 app.use('/revista', require('./routes/rutasRevistas') );
+
+app.use('/funcionesServidor', require('./routes/funcionesServidor'));
 app.use('/funcionesServidorPlantillaRevista', require('./routes/funcionesServidorPlantillaRevista') );
 
 // Atrapa el error 404 (página no encontrada) y lo maneja

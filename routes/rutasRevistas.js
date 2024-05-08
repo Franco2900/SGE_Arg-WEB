@@ -32,7 +32,7 @@ const convertirExcelDeDialnet = require('./convertidorExcelDeDialnet.js');
 router.get('/:revista', function(req, res, next) {
 
     try{
-        let pagina = plantilla.armarHTML(req.params.revista);
+        let pagina = plantilla.armarHTML(req.params.revista, req.cookies);
         res.send(pagina);
     }
     catch(error){

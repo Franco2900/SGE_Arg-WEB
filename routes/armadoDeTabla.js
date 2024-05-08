@@ -29,10 +29,16 @@ function crearListado(archivoJSON){
 }
 
 // Crea una tabla HTML con el arreglo de revistas pasado, sin importar el tamaño del arreglo
-function armarTablaDeRevistas(arregloRevistas, numeroPagina){
+function armarTablaDeRevistas(cookies, arregloRevistas, numeroPagina){
+
+    let claseDeLaTabla = "table table-light table-striped table-bordered";
+    if(cookies.fondoPantalla){ // Si existe la cookie
+        if(cookies.fondoPantalla == "Modo claro")  claseDeLaTabla = 'table table-light table-striped table-bordered'; 
+        if(cookies.fondoPantalla == "Modo oscuro") claseDeLaTabla = 'table table-dark table-striped table-bordered';
+    }
 
     let tabla = 
-    `<table id="tablaRevistas" border="1" class="table table-light table-striped table-bordered">
+    `<table id="tablaRevistas" border="1" class="${claseDeLaTabla}">
         <thead>
             <tr>
                 <th class="text-center">N° Revista</th>

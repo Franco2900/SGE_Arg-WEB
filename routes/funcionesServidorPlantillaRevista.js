@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-const bodyParser = require('body-parser') // Módulo para trabajar con las solicitudes POST
 const fs = require('fs');                 // Módulo para trabajar con archivos locales
 const path = require('path');             // Módulo para trabajar con paths
 const chokidar = require('chokidar');     // Módulo para poder detectar la creación de archivos
@@ -10,6 +9,7 @@ const calculadoraTiempoPromedioActualizacion = require('./calculadoraTiempoProme
 
 /*****************************************************************************************************************************/
 // ENRUTAMIENTO: MANEJO DE PETICIONES POST
+// ACÁ VAN LAS FUNCIONES DEL SERVIDOR QUE SE PUEDEN EJECUTAR SOLO SI NOS ENCONTRAMOS EN ALGUNA REVISTA DEL SITIO WEB
 /*****************************************************************************************************************************/
 
 router.post('/paginaSiguiente', function(req, res){

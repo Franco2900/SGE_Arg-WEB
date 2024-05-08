@@ -6,6 +6,19 @@ var router = express.Router();
 /* GET home page. */
 router.get('/', function(req, res, next) {
 
+  // Manejo de cookies
+  let cookies = req.cookies;
+
+  let fondo = 'fondoClaro'; // Valor por defecto
+  let botonFondo = '<button id="botonCambiarFondo" class="bi bi-lightbulb">Modo claro</button>';
+  let claseTabla = 'text-center table table-light table-bordered';
+
+  if(cookies.fondoPantalla && cookies.fondoPantalla == "Modo oscuro"){ // Si existe la cookie y esta en Modo oscuro
+    fondo = 'fondoOscuro';
+    botonFondo = '<button id="botonCambiarFondo" class="bi bi-lightbulb-off">Modo oscuro</button>'
+    claseTabla = 'text-center table table-dark table-bordered';
+  }
+
   let pagina = 
   `<!DOCTYPE html>
   <html>
@@ -17,43 +30,14 @@ router.get('/', function(req, res, next) {
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     </head>
-    <body class='fondoClaro container-fluid'>
+    <body class='${fondo} container-fluid'>
       <h1><center>Sistema de Gestión Editorial Argentino</center></h1>
 
       <div class="row">
         <div class="col-md-6 text-start">
-          <button id="botonCambiarFondo" class="bi bi-lightbulb">Modo claro</button>
+          ${botonFondo}
         </div>
       </div>
-
-      <script>
-        let botonCambiarFondo = document.getElementById("botonCambiarFondo");
-                  
-        botonCambiarFondo.addEventListener("click", function(){
-                            
-            if(botonCambiarFondo.innerText == "Modo claro") 
-            {
-              document.getElementsByTagName("body")[0].classList.remove('fondoClaro');
-              document.getElementsByTagName("body")[0].classList.add('fondoOscuro');
-        
-              botonCambiarFondo.innerText = "Modo oscuro";
-              botonCambiarFondo.setAttribute('class', 'bi bi-lightbulb-off');
-        
-              document.getElementById("tablaRevistas").setAttribute('class', 'table table-dark table-striped table-bordered');
-            }
-            else 
-            {
-              document.getElementsByTagName("body")[0].classList.remove('fondoOscuro');
-              document.getElementsByTagName("body")[0].classList.add('fondoClaro');
-        
-              botonCambiarFondo.innerText = "Modo claro";
-              botonCambiarFondo.setAttribute('class', 'bi bi-lightbulb');
-        
-              document.getElementById("tablaRevistas").setAttribute('class', 'table table-light table-striped table-bordered');
-            }
-                            
-        });
-      </script>
 
       <p>
           Este sitio sirve para saber cuales son las revistas cientificas y educativas de la Republica Argentina. Para saber esto extraemos la 
@@ -105,7 +89,7 @@ router.get('/', function(req, res, next) {
     // TABLA QUE MUESTRA EL ESTADO DE LOS ARCHIVOS
     pagina +=
     `
-      <table class="text-center table table-bordered">
+      <table id="tablaEstadosDeLasRevistas" class="${claseTabla}">
         <caption>Se considera que una revista tiene datos desactualizados si ya pasaron más de 365 días desde su última actualización</caption>
         <thead>
           <tr>
@@ -191,6 +175,8 @@ router.get('/', function(req, res, next) {
       </table>
 
       <br/>
+
+      <script src="/javascripts/funcionesClienteIndex.js"></script>
 
     </body>
   </html>
