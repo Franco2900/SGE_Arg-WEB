@@ -8,11 +8,9 @@ const bodyParser = require('body-parser') // Módulo para trabajar con las solic
 
 var app = express(); // Creo una aplicación express
 
-
 // Configuración del motor de vistas
 app.set('views', path.join(__dirname, 'views')); // Indico en que path esta la carpeta de vistas
 app.set('view engine', 'hbs');                   // Indico que motor de vistas se va a usar
-
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -21,6 +19,14 @@ app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+
+// CONFIGURACIÓN DE LA API
+const swaggerUI  = require('swagger-ui-express'); // Módulo para mostrar una interfaz de usuario (UI) de la documentación
+const swaggerDoc = require('./swaggerDoc.json'); 
+
+app.use('/api', require('./routes/api') );
+app.use('/api-doc', swaggerUI.serve, swaggerUI.setup(swaggerDoc) ); // Indico en que URI debe mostrarse la documentación de la API
+// FIN DE LA CONFIGURACIÓN DE LA API
 
 app.use("/images", express.static(path.join(__dirname, "/public/images")));           // Indico en que path esta la carpeta de imágenes
 app.use("/revista/images", express.static(path.join(__dirname, "/public/images"))); 
@@ -33,6 +39,7 @@ app.use("/stylesheets", express.static(path.join(__dirname, "/public/stylesheets
 app.use('/', require('./routes/index') );     
 app.use('/users', require('./routes/users') );
 app.use('/revista', require('./routes/rutasRevistas') );
+
 
 app.use('/funcionesServidor', require('./routes/funcionesServidor'));
 app.use('/funcionesServidorPlantillaRevista', require('./routes/funcionesServidorPlantillaRevista') );

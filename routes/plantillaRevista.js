@@ -79,14 +79,14 @@ function armarHTML(tituloSitioWeb, cookies){
                 </div>
 
                 <div class="col-md-6 text-end">
-                    <a href="http://localhost:3000/api/descargarCSV?archivoCSV=${tituloSitioWeb}">
+                    <a href="http://localhost:3000/funcionesServidorPlantillaRevista/descargarCSV?archivoCSV=${tituloSitioWeb}">
                         <button id="botonDescargarCSV">
                             Descargar CSV
                             <span class="bi bi-download"></span>
                         </button>
                     </a>
 
-                    <a href="http://localhost:3000/api/descargarJSON?archivoJSON=${tituloSitioWeb}">
+                    <a href="http://localhost:3000/funcionesServidorPlantillaRevista/descargarJSON?archivoJSON=${tituloSitioWeb}">
                         <button id="botonDescargarJSON">
                             Descargar JSON
                             <span class="bi bi-download"></span>

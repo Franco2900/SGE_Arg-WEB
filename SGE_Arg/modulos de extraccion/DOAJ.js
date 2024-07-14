@@ -87,7 +87,7 @@ function extraerInfoDOAJ(paginaActual = 1, revista = 1, info = "Título;ISSN imp
             // Si no termine de consultar todas las páginas, vuelvo a hacer la consulta pero en la página siguiente y con la info que ya obtuvimos
             if(paginaActual != cantidadPaginas) extraerInfoDOAJ(++paginaActual, revista, info);
             
-            escribirInfo(info);
+            if(paginaActual == cantidadPaginas) escribirInfo(info);
         }
     };
     

@@ -312,7 +312,7 @@ router.post('/actualizarCatalogo', function(req, res){
         {
             let vigilante = chokidar.watch(path.join(__dirname, `../SGE_Arg/Revistas/${req.body.tituloSitioWeb}.json`) ); // Archivo que le indico que vigile
     
-            vigilante.on('add', function(path) { // Cuando detecta la creación del archivo indicado, se ejecuta la función
+            vigilante.on('add', function() { // Cuando detecta la creación del archivo indicado, se ejecuta la función
                 
                 vigilante.close();
                 //clearTimeout(timeOut);
@@ -328,7 +328,7 @@ router.post('/actualizarCatalogo', function(req, res){
                 console.log(`Se tardo ${segundos} segundos en extraer los datos`);
 
                 // Se supone que si no existe el archivo JSON, tampoco existe el archivo con todos los tiempos de extracción
-                fs.writeFile(path.join(__dirname, `../SGE_Arg/Tiempos/${req.body.tituloSitioWeb}Tiempo.txt`), `${segundos};`, error => 
+                fs.writeFile(path.join(__dirname, `../SGE_Arg/Tiempos/${req.body.tituloSitioWeb}Tiempo.txt`), `${segundos};`, function(error) 
                 { 
                     if(error) console.log(error);
                 })
