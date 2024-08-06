@@ -7,7 +7,7 @@ const path = require('path'); // Módulo para trabajar con rutas
 async function extraerInfoRevistas() {
     //esta opcion es para ver la extraccion en el navegador, es necesario en este modulo de extraccion
     //ya que se necesita controlar la ubicacion de los componentes y orden de aparicion
-  const browser = await puppeteer.launch({ headless: false, defaultViewport: null,
+  const browser = await puppeteer.launch({ headless: 'new', defaultViewport: null,
   args: ['--start-maximized']});
    
     const page = await browser.newPage();
@@ -194,9 +194,9 @@ async function extraerInfoWoS() {
 */
 
   // Paso los datos de los objetos a string
-  let info = "Título;ISSN impresa;ISSN en linea;Instituto" + "\n";
+  let info = "Título;ISSN impresa;ISSN en linea;Instituto;URL" + "\n";
   for(let i = 0; i < listaDeRevistas.length; i++){
-    info += `${listaDeRevistas[i].Título};${listaDeRevistas[i].issnImpreso};${listaDeRevistas[i].issnEnLinea};${listaDeRevistas[i].Instituto}` + "\n";
+    info += `${listaDeRevistas[i].Título};${listaDeRevistas[i].issnImpreso};${listaDeRevistas[i].issnEnLinea};${listaDeRevistas[i].Instituto};` + "\n";
   }
 
   const csvFilePath  = path.join(__dirname + '/../Revistas/WoS.csv');

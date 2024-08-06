@@ -167,57 +167,80 @@ function crearListado() {
         }
 
 
-        // Chequeo en que sitios web esta una revista, fijandome si su ISSN en línea aparece en los distintos archivos JSON 
+        // Chequeo en que sitios web esta una revista, fijandome si su ISSN aparece en los distintos archivos JSON 
         //ARREGLAR: Solo sirve si se cargan todos los archivos
         for(var r = 0; r < revistas.length; r++) // Eligo una revista de mi arreglo
         {
-            for(var i = 0; i < archivosJSON.length; i++) // Eligo un sitio web / archivo JSON
+            for(var i = 0; i < archivosJSON.length; i++) // Eligo archivo JSON
             {
-                for(var j = 0; j < archivosJSON[i].length; j++) // Recorro todas las revistas del sitio web / archivo JSON
+                for(var j = 0; j < archivosJSON[i].length; j++) // Recorro todas las revistas del archivo JSON
                 {
-                    if(archivosJSON[i][j]['ISSN en linea'] == revistas[r].issnEnLinea) // Si el ISSN electronico de la revista del arreglo y el ISSN electronico de la revista del JSON coinciden, entonces la revista del arreglo se encuentra en dicho sitio web
+                    if(revistas[r].issnEnLinea != "" && revistas[r].issnImpreso != "") // Si ambos ISSN no son vacios
                     {
-                        //console.log(`r:${r} - i:${i} - j:${j} - ${archivosJSON[i][j]['ISSN en linea']} - ${revistas[r].issnEnLinea}`); // DEBUGEO
+                        if(archivosJSON[i][j]['ISSN en linea'] == revistas[r].issnEnLinea || archivosJSON[i][j]['ISSN impresa'] == revistas[r].issnImpreso) // Si el ISSN de la revista del arreglo y el ISSN de la revista del JSON coinciden, entonces la revista del arreglo se encuentra en dicho sitio web
+                        {
+                            // DEBUG
+                            // console.log("ISSN EN LINEA: " + revistas[r].issnEnLinea + "; ISSN IMPRESO: " + revistas[r].issnImpreso);
+                            // console.log(`Coincidencia en el ARCHIVO JSON ${i} REVISTA ${j} ISSN EN LINEA ${archivosJSON[i][j]['ISSN en linea']} ISSN IMPRESO ${archivosJSON[i][j]['ISSN impresa']}`)
 
-                        if(i == 0) revistas[r].CAICYT   = true;
-                        if(i == 1) revistas[r].DOAJ     = true;
-                        if(i == 2) revistas[r].Latindex = true;
-                        if(i == 3) revistas[r].Redalyc  = true;
-                        if(i == 4) revistas[r].Scimago  = true;
-                        if(i == 5) revistas[r].Scielo   = true;
-                        if(i == 6) revistas[r].WoS      = true;
-                        if(i == 7) revistas[r].Biblat   = true;
-                        if(i == 8) revistas[r].Dialnet  = true;
+                            if(i == 0) revistas[r].CAICYT   = true;
+                            if(i == 1) revistas[r].DOAJ     = true;
+                            if(i == 2) revistas[r].Latindex = true;
+                            if(i == 3) revistas[r].Redalyc  = true;
+                            if(i == 4) revistas[r].Scimago  = true;
+                            if(i == 5) revistas[r].Scielo   = true;
+                            if(i == 6) revistas[r].WoS      = true;
+                            if(i == 7) revistas[r].Biblat   = true;
+                            if(i == 8) revistas[r].Dialnet  = true;
+                        }
                     }
-                    
+
+
+                    else if(revistas[r].issnEnLinea != "") // Si solo el ISSN en linea no es vacio
+                    {
+                        if(archivosJSON[i][j]['ISSN en linea'] == revistas[r].issnEnLinea) 
+                        {
+                            // DEBUG
+                            // console.log("ISSN EN LINEA: " + revistas[r].issnEnLinea + "; ISSN IMPRESO: " + revistas[r].issnImpreso);
+                            // console.log(`Coincidencia en el ARCHIVO JSON ${i} REVISTA ${j} ISSN EN LINEA ${archivosJSON[i][j]['ISSN en linea']} ISSN IMPRESO ${archivosJSON[i][j]['ISSN impresa']}`)
+
+                            if(i == 0) revistas[r].CAICYT   = true;
+                            if(i == 1) revistas[r].DOAJ     = true;
+                            if(i == 2) revistas[r].Latindex = true;
+                            if(i == 3) revistas[r].Redalyc  = true;
+                            if(i == 4) revistas[r].Scimago  = true;
+                            if(i == 5) revistas[r].Scielo   = true;
+                            if(i == 6) revistas[r].WoS      = true;
+                            if(i == 7) revistas[r].Biblat   = true;
+                            if(i == 8) revistas[r].Dialnet  = true;
+                        }
+                    }
+
+
+                    else if(revistas[r].issnImpreso != "") // Si solo el ISSN impreso no es vacio
+                    {
+                        if(archivosJSON[i][j]['ISSN impresa'] == revistas[r].issnImpreso)
+                        {
+                            // DEBUG
+                            // console.log("ISSN EN LINEA: " + revistas[r].issnEnLinea + "; ISSN IMPRESO: " + revistas[r].issnImpreso);
+                            // console.log(`Coincidencia en el ARCHIVO JSON ${i} REVISTA ${j} ISSN EN LINEA ${archivosJSON[i][j]['ISSN en linea']} ISSN IMPRESO ${archivosJSON[i][j]['ISSN impresa']}`)
+
+                            if(i == 0) revistas[r].CAICYT   = true;
+                            if(i == 1) revistas[r].DOAJ     = true;
+                            if(i == 2) revistas[r].Latindex = true;
+                            if(i == 3) revistas[r].Redalyc  = true;
+                            if(i == 4) revistas[r].Scimago  = true;
+                            if(i == 5) revistas[r].Scielo   = true;
+                            if(i == 6) revistas[r].WoS      = true;
+                            if(i == 7) revistas[r].Biblat   = true;
+                            if(i == 8) revistas[r].Dialnet  = true;
+                        }
+                    }
+
                 }
             }
         }
 
-        // Lo mismo que la anterior pero con los ISSN impresos
-        //ARREGLAR: Solo sirve si se cargan todos los archivos
-        for(var r = 0; r < revistas.length; r++) 
-        {
-            for(var i = 0; i < archivosJSON.length; i++) 
-            {
-                for(var j = 0; j < archivosJSON[i].length; j++) 
-                {
-                    if(archivosJSON[i][j]['ISSN impresa'] == revistas[r].issnEnLinea)
-                    {
-                        if(i == 0) revistas[r].CAICYT   = true;
-                        if(i == 1) revistas[r].DOAJ     = true;
-                        if(i == 2) revistas[r].Latindex = true;
-                        if(i == 3) revistas[r].Redalyc  = true;
-                        if(i == 4) revistas[r].Scimago  = true;
-                        if(i == 5) revistas[r].Scielo   = true;
-                        if(i == 6) revistas[r].WoS      = true;
-                        if(i == 7) revistas[r].Biblat   = true;
-                        if(i == 8) revistas[r].Dialnet  = true;
-                    }
-                    
-                }
-            }
-        }
 
 
         // Este filtro se fija si los datos que proporciono un sitio web están mal o no. Puede darse el caso de que un sitio web de datos equivocados sobre una revista
@@ -248,6 +271,37 @@ function crearListado() {
         }
         */
 
+        // Agrego los URLs de las revistas (creo nuevas propiedades que no estaban en el constructor ya que este esta hecho para que funcione con todos los archivos .json)
+        // NOTA: SI ALGUNO TIRA COMO RESULTADO UNDEFINED ES PORQUE TODAVÍA NO SE EXTRAE EL CAMPO URL DE DICHO SITIO WEB
+        for(var r = 0; r < revistas.length; r++)
+        {
+            revistas[r].URL_CAICYT = "";
+            if (revistas[r].CAICYT) revistas[r].URL_CAICYT = buscarURL(revistas[r].issnEnLinea, revistas[r].issnImpreso, "CAICYT");
+
+            revistas[r].URL_DOAJ = "";
+            if (revistas[r].DOAJ) revistas[r].URL_DOAJ = buscarURL(revistas[r].issnEnLinea, revistas[r].issnImpreso, "DOAJ");
+            
+            revistas[r].URL_Latindex = "";
+            if (revistas[r].Latindex) revistas[r].URL_Latindex = buscarURL(revistas[r].issnEnLinea, revistas[r].issnImpreso, "Latindex"); 
+            
+            revistas[r].URL_Redalyc = "";
+            if (revistas[r].Redalyc) revistas[r].URL_Redalyc = buscarURL(revistas[r].issnEnLinea, revistas[r].issnImpreso, "Redalyc");     
+
+            revistas[r].URL_Scimago = "";
+            if (revistas[r].Scimago) revistas[r].URL_Scimago = buscarURL(revistas[r].issnEnLinea, revistas[r].issnImpreso, "Scimago");                    
+
+            revistas[r].URL_Scielo = "";
+            if (revistas[r].Scielo) revistas[r].URL_Scielo = buscarURL(revistas[r].issnEnLinea, revistas[r].issnImpreso, "Scielo");                 
+
+            revistas[r].URL_WoS = "";
+            if (revistas[r].WoS) revistas[r].URL_WoS = buscarURL(revistas[r].issnEnLinea, revistas[r].issnImpreso, "WoS");
+
+            revistas[r].URL_Biblat = "";
+            if (revistas[r].Biblat) revistas[r].URL_Biblat = buscarURL(revistas[r].issnEnLinea, revistas[r].issnImpreso, "Biblat");                    
+
+            revistas[r].URL_Dialnet = "";
+            if (revistas[r].Dialnet) revistas[r].URL_Dialnet = buscarURL(revistas[r].issnEnLinea, revistas[r].issnImpreso, "Dialnet");    
+        }
 
 
         console.log("***********************************************************");
@@ -260,15 +314,15 @@ function crearListado() {
         // Encabezado
         var listado = "Título;ISSN impresa;ISSN en linea;Instituto/Editorial";
         
-        if(archivoCAICYTEncontrado)   listado += ";CAICYT"
-        if(archivoDOAJEncontrado)     listado += ";DOAJ"
-        if(archivoLatindexEncontrado) listado += ";Latindex"
-        if(archivoRedalycEncontrado)  listado += ";Redalyc"
-        if(archivoScimagoEncontrado)  listado += ";Scimago"
-        if(archivoScieloEncontrado)   listado += ";Scielo"
-        if(archivoWoSEncontrado)      listado += ";WoS"
-        if(archivoBiblatEncontrado)   listado += ";Biblat"
-        if(archivoDialnetEncontrado)  listado += ";Dialnet"
+        if(archivoCAICYTEncontrado)   listado += ";CAICYT;URL_CAICYT"
+        if(archivoDOAJEncontrado)     listado += ";DOAJ;URL_DOAJ"
+        if(archivoLatindexEncontrado) listado += ";Latindex;URL_Latindex"
+        if(archivoRedalycEncontrado)  listado += ";Redalyc;URL_Redalyc"
+        if(archivoScimagoEncontrado)  listado += ";Scimago;URL_Scimago"
+        if(archivoScieloEncontrado)   listado += ";Scielo;URL_Scielo"
+        if(archivoWoSEncontrado)      listado += ";WoS;URL_WoS"
+        if(archivoBiblatEncontrado)   listado += ";Biblat;URL_Biblat"
+        if(archivoDialnetEncontrado)  listado += ";Dialnet;URL_Dialnet"
         
         listado += "\n";
 
@@ -279,15 +333,15 @@ function crearListado() {
             listado += `${revistas[i].titulo};${revistas[i].issnImpreso};${revistas[i].issnEnLinea};${revistas[i].instituto}`
         
             // Si dicha revista fue encontrada o no en un sitio web
-            if(archivoCAICYTEncontrado)   listado += `;${revistas[i].CAICYT}`
-            if(archivoDOAJEncontrado)     listado += `;${revistas[i].DOAJ}`
-            if(archivoLatindexEncontrado) listado += `;${revistas[i].Latindex}`
-            if(archivoRedalycEncontrado)  listado += `;${revistas[i].Redalyc}`
-            if(archivoScimagoEncontrado)  listado += `;${revistas[i].Scimago}`
-            if(archivoScieloEncontrado)   listado += `;${revistas[i].Scielo}`
-            if(archivoWoSEncontrado)      listado += `;${revistas[i].WoS}`
-            if(archivoBiblatEncontrado)   listado += `;${revistas[i].Biblat}`
-            if(archivoDialnetEncontrado)  listado += `;${revistas[i].Dialnet}`
+            if(archivoCAICYTEncontrado)   listado += `;${revistas[i].CAICYT};${revistas[i].URL_CAICYT}`
+            if(archivoDOAJEncontrado)     listado += `;${revistas[i].DOAJ};${revistas[i].URL_DOAJ}`
+            if(archivoLatindexEncontrado) listado += `;${revistas[i].Latindex};${revistas[i].URL_Latindex}`
+            if(archivoRedalycEncontrado)  listado += `;${revistas[i].Redalyc};${revistas[i].URL_Redalyc}`
+            if(archivoScimagoEncontrado)  listado += `;${revistas[i].Scimago};${revistas[i].URL_Scimago}`
+            if(archivoScieloEncontrado)   listado += `;${revistas[i].Scielo};${revistas[i].URL_Scielo}`
+            if(archivoWoSEncontrado)      listado += `;${revistas[i].WoS};${revistas[i].URL_WoS}`
+            if(archivoBiblatEncontrado)   listado += `;${revistas[i].Biblat};${revistas[i].URL_Biblat}`
+            if(archivoDialnetEncontrado)  listado += `;${revistas[i].Dialnet};${revistas[i].URL_Dialnet}`
         
             listado += "\n";
         }
@@ -320,4 +374,24 @@ function crearListado() {
 
 }
 
+function buscarURL(issnEnLinea, issnImpreso, nombreArchivoJSON)
+{
+    let URL = "";
+    let archivoJSON = require(path.join(__dirname + `/Revistas/${nombreArchivoJSON}.json`))
+
+    for(let i = 0; i < archivoJSON.length; i++)
+    {
+        //console.log(archivoJSON[i].issnEnLinea + "; ISSN en linea: " +  issnEnLinea);
+        //console.log(archivoJSON[i].issnImpreso + "; ISSN impreso: " + issnImpreso);
+        if(archivoJSON[i]['ISSN en linea'] == issnEnLinea || archivoJSON[i]['ISSN impresa'] == issnImpreso)
+        {
+            URL = archivoJSON[i].URL; 
+            i = archivoJSON.length;
+        }
+    }
+
+    return URL;
+}
+
 exports.crearListado = crearListado;
+crearListado();

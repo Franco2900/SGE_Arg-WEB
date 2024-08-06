@@ -54,7 +54,9 @@ async function descargarArchivo() {
             issnImpreso: issnFormatted,   // Índice 4 para el campo Issn
             issnEnLinea: eissnFormatted, // Índice 4 para el campo eIssn
             //instituto: fila[17].replace(/;/g, ',')   // Índice 17 para el campo Publisher
-            instituto: new String(fila[17]).replace(/;/g, ',')   
+            instituto: new String(fila[20]).replace(/;/g, ','),
+            
+            sourceId: new String(fila[1]).replace(/;/g, ','), // Le añadí esta propiedad para poder crear los URLs
           };
 
           resultados.push(objetoResultado);
@@ -90,9 +92,9 @@ async function extraerInfoScimagojr() {
   const jsonFilePath = path.join(__dirname + '/../Revistas/Scimago.json');
 
   // Paso los datos de los objetos a string
-  let info = "Título;ISSN impresa;ISSN en linea;Instituto" + "\n";
+  let info = "Título;ISSN impresa;ISSN en linea;Instituto;URL" + "\n";
   for(let i = 0; i < listaDeRevistas.length; i++){
-    info += `${listaDeRevistas[i].titulo};${listaDeRevistas[i].issnImpreso};${listaDeRevistas[i].issnEnLinea};${listaDeRevistas[i].instituto}` + "\n";
+    info += `${listaDeRevistas[i].titulo};${listaDeRevistas[i].issnImpreso};${listaDeRevistas[i].issnEnLinea};${listaDeRevistas[i].instituto};https://www.scimagojr.com/journalsearch.php?q=${listaDeRevistas[i].sourceId}&tip=sid&clean=0` + "\n";
   }
 
   // Con todos los datos en string, escribo la info en formato .csv y después uso el modulo csvtojson para crear el archivo .json

@@ -89,22 +89,22 @@ async function extraerInfoRevista(urls) {
       page.setDefaultNavigationTimeout(0);
       await page.goto(url);
         
-        // Extraer los valores de issn y issn_e
-  const issnMatches = await page.evaluate(() => {
-    const spanElement = document.querySelector('.issn');
-    const textContent = spanElement.textContent;
+      // Extraer los valores de issn y issn_e
+      const issnMatches = await page.evaluate(() => {
+        const spanElement = document.querySelector('.issn');
+        const textContent = spanElement.textContent;
 
-    // Crear patrones para extraer los ISSN
-    const printPattern = /versión\s+impresa\s+ISSN\s+(....-....)/i;
-    const onlinePattern = /versión\s+On-line\s+ISSN\s+(....-....)/i;
+        // Crear patrones para extraer los ISSN
+        const printPattern = /versión\s+impresa\s+ISSN\s+(....-....)/i;
+        const onlinePattern = /versión\s+On-line\s+ISSN\s+(....-....)/i;
 
-    const issnImpreso = textContent.match(printPattern);
-    const issnEnLinea = textContent.match(onlinePattern);
+        const issnImpreso = textContent.match(printPattern);
+        const issnEnLinea = textContent.match(onlinePattern);
 
-    return [issnImpreso ? issnImpreso[1] : '', issnEnLinea ? issnEnLinea[1] : ''];
-  });
+        return [issnImpreso ? issnImpreso[1] : '', issnEnLinea ? issnEnLinea[1] : ''];
+      });
 
-  const [issnImpreso, issnEnLinea] = issnMatches; 
+      const [issnImpreso, issnEnLinea] = issnMatches; 
 
       // Extraer el texto de la etiqueta <span class="titulo">Salud colectiva</span>
       const titulo = await page.evaluate(() => {
@@ -115,25 +115,30 @@ async function extraerInfoRevista(urls) {
       // Extrae el valor de la etiqueta <strong>
       const instituto = await page.evaluate(() => {
         const titleElement = document.querySelector(".journalTitle");
-        return titleElement ? titleElement.innerText.trim() : null;
+        return titleElement ? titleElement.innerText.trim().replaceAll(";", ",").replace(/(\r\n|\n|\r)/gm, " ") : null;
       });
 
       console.log("Valor de ISSN:", issnImpreso);
       console.log("Valor de ISSN-e:", issnEnLinea);
       console.log("INSTITUCION:", instituto);
       console.log("REVISTA: ", titulo);
+      console.log("URL: ", url);
+      console.log("************************************************************************");
 
       registros.push({
         titulo,
         instituto,
         issnImpreso,
         issnEnLinea,
+        url
       });
+
     } catch (error) {
       console.error(`Error al procesar enlace: ${url}`);
       console.error(error);
       // Continúa con el siguiente URL si hay un error
       continue;
+
     } finally {
       await page.close();
     }
@@ -166,9 +171,9 @@ async function extraerInfoScielo() {
  console.log(`Archivo CSV creado: ${csvFilePath}`);*/
 
   // Paso los datos de los objetos a string
-  let info = "Título;ISSN impresa;ISSN en linea;Instituto" + "\n";
+  let info = "Título;ISSN impresa;ISSN en linea;Instituto;URL" + "\n";
   for(let i = 0; i < registros.length; i++){
-    info += `${registros[i].titulo};${registros[i].issnImpreso};${registros[i].issnEnLinea};${registros[i].instituto}` + "\n";
+    info += `${registros[i].titulo};${registros[i].issnImpreso};${registros[i].issnEnLinea};${registros[i].instituto};${registros[i].url}` + "\n";
   }
 
  const jsonFilePath = path.join(__dirname + '/../Revistas/Scielo.json');
