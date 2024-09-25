@@ -43,7 +43,8 @@ router.post('/paginaSiguiente', function(req, res){
 
             /*if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   datos = armadoDeTabla.armarTablaDeRevistasCasosEspeciales(las20RevistasDelaPagina, paginaSiguiente)
             else                                                            datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaSiguiente)*/
-            datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaSiguiente)
+
+            datos = armadoDeTabla.armarTablaDeRevistas(req.cookies, las20RevistasDelaPagina, paginaSiguiente)
         }
 
         res.send(datos);
@@ -82,7 +83,7 @@ router.post('/paginaAnterior', function(req, res){
 
             /*if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   datos = armadoDeTabla.armarTablaDeRevistasCasosEspeciales(las20RevistasDelaPagina, paginaAnterior)
             else                                                            datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaAnterior)*/
-            datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaAnterior)
+            datos = armadoDeTabla.armarTablaDeRevistas(req.cookies, las20RevistasDelaPagina, paginaAnterior)
         }
 
         res.send(datos);
@@ -118,7 +119,7 @@ router.post('/primeraPagina', function(req, res){
 
         /*if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   datos = armadoDeTabla.armarTablaDeRevistasCasosEspeciales(las20RevistasDelaPagina, 1)
         else                                                            datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, 1)*/
-        datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, 1);
+        datos = armadoDeTabla.armarTablaDeRevistas(req.cookies, las20RevistasDelaPagina, 1);
 
         res.send(datos);
     }
@@ -155,7 +156,7 @@ router.post('/ultimaPagina', function(req, res){
 
         /*if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   datos = armadoDeTabla.armarTablaDeRevistasCasosEspeciales(las20RevistasDelaPagina, cantidadPaginas)
         else                                                            datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, cantidadPaginas)*/
-        datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, cantidadPaginas);
+        datos = armadoDeTabla.armarTablaDeRevistas(req.cookies, las20RevistasDelaPagina, cantidadPaginas);
         
         res.send(datos);
     }
@@ -197,7 +198,7 @@ router.post('/buscarPaginaEspecifica', function(req, res){
 
             /*if(tituloSitioWeb == 'Biblat' || tituloSitioWeb == 'Dialnet')   datos = armadoDeTabla.armarTablaDeRevistasCasosEspeciales(las20RevistasDelaPagina, paginaBuscada)
             else                                                            datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaBuscada)*/
-            datos = armadoDeTabla.armarTablaDeRevistas(las20RevistasDelaPagina, paginaBuscada)
+            datos = armadoDeTabla.armarTablaDeRevistas(req.cookies, las20RevistasDelaPagina, paginaBuscada)
         }
 
         res.send(datos);
